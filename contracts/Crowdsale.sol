@@ -22,8 +22,14 @@ contract Crowdsale {
 	uint public softCap;
 	uint public hardCap;
 
+	// minimum amount of value to transfer to beneficiary in automatic mode
+	uint public quantum;
+
+	// current contract balance
+	uint public balance;
+
 	// how much funds raised
-	uint public fundsRaised;
+	uint public collected;
 
 	// how much tokens sold
 	uint public tokensSold;
@@ -34,11 +40,15 @@ contract Crowdsale {
 	// how many token units a buyer gets per wei
 	uint public rate;
 
+	// how many successful transactions (with tokens being send back) do we have
+	uint public transactions;
+
 	function Crowdsale(
 		uint _offset,
 		uint _length,
 		uint _softCap,
 		uint _hardCap,
+		uint _quantum,
 		uint _rate,
 		address _token,
 		address _beneficiary
@@ -48,6 +58,7 @@ contract Crowdsale {
 		require(_length > 0);
 		require(_softCap > 0);
 		require(_hardCap > _softCap);
+		require(_quantum > 0);
 		require(_rate > 0);
 		require(_token != address(0));
 		require(_beneficiary != address(0));
@@ -57,6 +68,7 @@ contract Crowdsale {
 		length = _length;
 		softCap = _softCap;
 		hardCap = _hardCap;
+		quantum = _quantum;
 		rate = _rate;
 		beneficiary = _beneficiary;
 
@@ -79,18 +91,29 @@ contract Crowdsale {
 		// how much value we must send to beneficiary
 		uint value = tokens * rate;
 
+		// ensure we are not crossing the hardCap
+		require(value + collected <= hardCap);
+
 		// transfer tokens to investor
 		token.transfer(investor, tokens);
 
-		// transfer value to beneficiary
-		beneficiary.transfer(value);
+		// accumulate the value or transfer it to beneficiary
+		if(value + collected < softCap || value + balance < quantum) {
+			// accumulate
+			balance += value;
+		}
+		else {
+			// transfer
+			beneficiary.transfer(value + balance);
+		}
 
 		// transfer the change to investor
 		investor.transfer(msg.value - value);
 
 		// update crowdsale status
-		fundsRaised += value;
+		collected += value;
 		tokensSold += tokens;
+		transactions++;
 
 	}
 
