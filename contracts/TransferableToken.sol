@@ -2,18 +2,20 @@ pragma solidity ^0.4.11;
 
 import './Transferable.sol';
 
+// Limited version of ERC20: implementation
+// TransferableToken is abstract, totalSupply() is not defined
 contract TransferableToken is Transferable {
 
 	// Balances for each account
-	mapping(address => uint256) balances;
+	mapping(address => uint) balances;
 
 	/**
 	* @dev Gets the balance of the specified address.
 	* @param _owner The address to query the the balance of.
-	* @return An uint256 representing the amount owned by the passed address.
+	* @return An uint representing the amount owned by the passed address.
 	*/
 	// What is the balance of a particular account?
-	function balanceOf(address _owner) constant returns (uint256 balance) {
+	function balanceOf(address _owner) constant returns (uint balance) {
 		return balances[_owner];
 	}
 
@@ -23,7 +25,7 @@ contract TransferableToken is Transferable {
 	* @param _to The address to transfer to.
 	* @param _value The amount to be transferred.
 	*/
-	function transfer(address _to, uint256 _value) returns (bool) {
+	function transfer(address _to, uint _value) returns (bool) {
 		// check input parameter(s)
 		assert(_value > 0); // non-negative transfer
 		assert(balances[_to] + _value > balances[_to]); // overflow check

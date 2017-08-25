@@ -1,7 +1,6 @@
 pragma solidity ^0.4.11;
 
 import './Transferable.sol';
-import './AgraraToken.sol';
 
 /**
  * @title Crowdsale
@@ -16,70 +15,83 @@ contract Crowdsale {
 	Transferable public token;
 
 	// start block number and number of blocks where investments are allowed (both inclusive)
-	uint256 public offset;
-	uint256 public length;
+	uint public offset;
+	uint public length;
 
-	// crowdsale goals (min. max)
-	uint256 public goalMin;
-	uint256 public goalMax;
+	// crowdsale goals (min, max)
+	uint public softCap;
+	uint public hardCap;
 
 	// how much funds raised
-	uint256 public fundsRaised;
+	uint public fundsRaised;
+
+	// how much tokens sold
+	uint public tokensSold;
 
 	// address where funds are collected
-	address public wallet;
+	address public beneficiary;
 
 	// how many token units a buyer gets per wei
-	uint256 public rate;
+	uint public rate;
 
 	function Crowdsale(
-		uint256 _offset,
-		uint256 _length,
-		uint256 _goalMin,
-		uint256 _goalMax,
-		uint256 _rate,
-		uint256 _totalSupply,
-		address _wallet
+		uint _offset,
+		uint _length,
+		uint _softCap,
+		uint _hardCap,
+		uint _rate,
+		address _token,
+		address _beneficiary
 	) {
 		// validate crowdsale settings (inputs)
 		require(_offset > 0);
 		require(_length > 0);
-		require(_goalMin > 0);
-		require(_goalMax > _goalMin);
+		require(_softCap > 0);
+		require(_hardCap > _softCap);
 		require(_rate > 0);
-		require(_totalSupply > 0);
-		require(_wallet != address(0));
+		require(_token != address(0));
+		require(_beneficiary != address(0));
 
 		// setup crowdsale settings
 		offset = _offset;
 		length = _length;
-		goalMin = _goalMin;
-		goalMax = _goalMax;
+		softCap = _softCap;
+		hardCap = _hardCap;
 		rate = _rate;
-		wallet = _wallet;
+		beneficiary = _beneficiary;
 
-		// create tokens, owned by a crowdsale
-		token = new AgraraToken(_totalSupply);
+		// link tokens, owned by a crowdsale
+		token = Transferable(_token);
 	}
 
 	function() payable {
 		// perform validations
 		require(block.number >= offset);
 		require(block.number <= offset + length);
-		require(msg.value >= rate);
+		require(msg.value >= rate); // this also ensures buying at least one token
 
-		// transfer tokens
-		token.transfer(msg.sender, msg.value / rate);
+		// call 'sender' nicely - investor
+		address investor = msg.sender;
 
-		// transfer funds
-		wallet.transfer(msg.value);
+		// how much tokens we must send to investor
+		uint tokens = msg.value / rate;
+
+		// how much value we must send to beneficiary
+		uint value = tokens * rate;
+
+		// transfer tokens to investor
+		token.transfer(investor, tokens);
+
+		// transfer value to beneficiary
+		beneficiary.transfer(value);
+
+		// transfer the change to investor
+		investor.transfer(msg.value - value);
 
 		// update crowdsale status
-		fundsRaised += msg.value;
+		fundsRaised += value;
+		tokensSold += tokens;
 
-		// log successful fund receive event
-		FundsReceived(msg.sender, msg.value, rate);
 	}
 
-	event FundsReceived(address indexed investorAddress, uint256 value, uint256 rate);
 }

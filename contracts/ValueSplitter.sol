@@ -9,32 +9,32 @@ contract ValueSplitter {
 
 	// minimum amount of funds which contract is allowed to process in one transaction
 	// can be useful to save on transaction fees
-	uint256 public quantum;
+	uint public quantum;
 
 	// current balance on the contract
-	uint256 public balance;
+	uint public balance;
 	// total amount of funds already passed through the contract
-	uint256 public proxied;
+	uint public proxied;
 
 	// last element in thresholds must be always 0,
 	// all 3 arrays must have the same lengths
-	uint256[] public thresholds;
-	uint256[] public numerators;
-	uint256[] public denominators;
+	uint[] public thresholds;
+	uint[] public numerators;
+	uint[] public denominators;
 
 	// current split state, see also thresholds, numerators and denominators arrays
-	uint256 internal idx = 0;
-	uint256 internal nextThreshold = 0;
-	uint256 internal currentNumerator = 1;
-	uint256 internal currentDenominator = 1;
+	uint internal idx = 0;
+	uint internal nextThreshold = 0;
+	uint internal currentNumerator = 1;
+	uint internal currentDenominator = 1;
 
 	function ValueSplitter(
 		address _wallet0,
 		address _wallet1,
-		uint256 _quantum,
-		uint256[] _thresholds,
-		uint256[] _numerators,
-		uint256[] _denominators
+		uint _quantum,
+		uint[] _thresholds,
+		uint[] _numerators,
+		uint[] _denominators
 	) {
 		// validate inputs
 		assert(_wallet0 != address(0));
@@ -43,8 +43,8 @@ contract ValueSplitter {
 		assert(_thresholds.length == _denominators.length);
 
 		// validate inputs: data in the arrays
-		uint256 threshold = 0;
-		for(uint256 i = 0; i < _thresholds.length; i++) {
+		uint threshold = 0;
+		for(uint i = 0; i < _thresholds.length; i++) {
 			assert(i == _thresholds.length - 1 && _thresholds[i] == 0 || _thresholds[i] > threshold);
 			assert(_numerators[i] <= _denominators[i]);
 			assert(_denominators[i] > 0);
@@ -70,7 +70,7 @@ contract ValueSplitter {
 
 	function() payable {
 		// total amount available on the contract:
-		uint256 total = balance + msg.value;
+		uint total = balance + msg.value;
 
 		if(total < quantum) {
 			// there is very little money available on contract, do nothing
@@ -79,8 +79,8 @@ contract ValueSplitter {
 		}
 
 		// there is enough money available on the contract, do the transfer
-		uint256 amount = 0;
-		uint256 currentThreshold = proxied;
+		uint amount = 0;
+		uint currentThreshold = proxied;
 		// while we're crossing the threshold, calculate the shit
 		while(nextThreshold != 0 && proxied + total > nextThreshold) {
 			// calculate how much is split using current rate
