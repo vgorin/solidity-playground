@@ -81,43 +81,10 @@ contract Crowdsale {
 		rate = _rate;
 		beneficiary = _beneficiary;
 
-		// link tokens, owned by a crowdsale
+		// link tokens, tokens are not owned by a crowdsale
+		// should be transferred to crowdsale after deployment
 		token = ERC20(_token);
 	}
-
-/*
-	function softCapReached() constant external returns (bool) {
-		return collected >= softCap;
-	}
-
-	function hardCapReached() constant external returns (bool) {
-		return collected >= hardCap;
-	}
-
-	function hasStarted() constant external returns (bool) {
-		return block.number >= offset;
-	}
-
-	function hasEnded() constant external returns (bool) {
-		return block.number >= offset + length || collected >= hardCap;
-	}
-
-	function isRunning() constant external returns (bool) {
-		return block.number >= offset && block.number < offset + length && collected < hardCap;
-	}
-
-	function isRunningSuccessfully() constant external returns (bool) {
-		return block.number >= offset && block.number < offset + length && collected < hardCap && collected >= softCap;
-	}
-
-	function progressByValue() constant external returns (uint) {
-		return 100 * collected / hardCap; // TODO: allow to change the precision
-	}
-
-	function progressInTime() constant external returns (uint) {
-		return 100 * (block.number - offset) / length; // TODO: allow to change the precision
-	}
-*/
 
 	// accepts crowdsale investment, requires
 	// crowdsale to be running and not reached its goal
