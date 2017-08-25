@@ -23,10 +23,6 @@ contract ConfigurableERC20 is FixedERC20 {
 		symbol = _symbol;
 		name = _name;
 		decimals = _decimals;
-
-
-		// init token balance of the owner, all tokens go to him
-		balances[msg.sender] = _totalSupply;
 	}
 
 }
