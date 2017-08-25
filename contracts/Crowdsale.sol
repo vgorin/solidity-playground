@@ -189,7 +189,7 @@ contract Crowdsale {
 		beneficiary.transfer(msg.value + balance);
 	}
 
-	// performs an investment or a refund,
+	// performs an investment, refund or withdrawal,
 	// depending on the crowdsale status
 	function() payable {
 		if(block.number < offset + length) {
