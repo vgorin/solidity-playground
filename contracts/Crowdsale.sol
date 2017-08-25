@@ -11,46 +11,56 @@ import './ERC20.sol';
  * as they arrive.
  */
 contract Crowdsale {
+	// address where funds are collected
+	address public beneficiary;
+
 	// The token being sold
 	ERC20 public token;
 
-	// start block number and number of blocks where investments are allowed (both inclusive)
-	uint public offset;
-	uint public length;
+	// how many token units a buyer gets per wei
+	uint public rate;
 
-	// crowdsale goals (min, max)
-	uint public softCap;
-	uint public hardCap;
+	// crowdsale start block number
+	uint public offset;
+
+	// crowdsale length in blocks
+	uint public length;
 
 	// minimum amount of value to transfer to beneficiary in automatic mode
 	uint public quantum;
 
+	// crowdsale minimum goal
+	uint public softCap;
+
+	// crowdsale maximum goal
+	uint public hardCap;
+
 	// current contract balance
 	uint public balance;
 
-	// how much funds raised
+	// how much value collected (funds raised)
 	uint public collected;
 
-	// how much refunded (if crowdsale failed)
+	// how much value refunded (if crowdsale failed)
 	uint public refunded;
 
-	// how much tokens sold
-	uint public tokensSold;
+	// how much tokens released to investors
+	uint public tokensReleased;
 
 	// how much tokens refunded (if crowdsale failed)
 	uint public tokensRefunded;
-
-	// address where funds are collected
-	address public beneficiary;
-
-	// how many token units a buyer gets per wei
-	uint public rate;
 
 	// how many successful transactions (with tokens being send back) do we have
 	uint public transactions;
 
 	// how many refund transactions (in exchange for tokens) made (if crowdsale failed)
 	uint public refunds;
+
+	// events
+	event GoalReached(uint amountRaised);
+	event SoftCapReached(uint softCap);
+	event InvestementAccepted(address indexed holder, uint256 tokenAmount, uint256 etherAmount);
+	event RefundIssued(address indexed holder, uint256 amount);
 
 	function Crowdsale(
 		uint _offset,
@@ -120,7 +130,7 @@ contract Crowdsale {
 			balance += value;
 		}
 		else {
-			// transfer all the value
+			// transfer all the value to beneficiary
 			beneficiary.transfer(value + balance);
 			// set balance to zero
 			balance = 0;
@@ -131,7 +141,7 @@ contract Crowdsale {
 
 		// update crowdsale status
 		collected += value;
-		tokensSold += tokens;
+		tokensReleased += tokens;
 		transactions++;
 	}
 
@@ -168,6 +178,17 @@ contract Crowdsale {
 		refunds++;
 	}
 
+	// sends all the value to the beneficiary
+	function withdraw() payable {
+		// perform validations
+		require(beneficiary == msg.sender); // only beneficiary can initiate this call
+		require(collected >= softCap); // crowdsale must be successful
+		require(balance > 0); // there should be something to transfer
+
+		// perform the transfer
+		beneficiary.transfer(msg.value + balance);
+	}
+
 	// performs an investment or a refund,
 	// depending on the crowdsale status
 	function() payable {
@@ -175,9 +196,13 @@ contract Crowdsale {
 			// crowdsale is running, invest
 			invest();
 		}
-		else {
+		else if(collected < softCap) {
 			// crowdsale ended, try to refund
 			refund();
+		}
+		else {
+			// maybe poor beneficiary is begging for change...
+			withdraw();
 		}
 	}
 
