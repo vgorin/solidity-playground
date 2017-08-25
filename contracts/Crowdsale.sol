@@ -103,8 +103,10 @@ contract Crowdsale {
 			balance += value;
 		}
 		else {
-			// transfer
+			// transfer all the value
 			beneficiary.transfer(value + balance);
+			// set balance to zero
+			balance = 0;
 		}
 
 		// transfer the change to investor
