@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 
-import './Transferable.sol';
+import './ERC20.sol';
 
 /**
  * @title Crowdsale
@@ -12,7 +12,7 @@ import './Transferable.sol';
  */
 contract Crowdsale {
 	// The token being sold
-	Transferable public token;
+	ERC20 public token;
 
 	// start block number and number of blocks where investments are allowed (both inclusive)
 	uint public offset;
@@ -31,8 +31,14 @@ contract Crowdsale {
 	// how much funds raised
 	uint public collected;
 
+	// how much refunded (if crowdsale failed)
+	uint public refunded;
+
 	// how much tokens sold
 	uint public tokensSold;
+
+	// how much tokens refunded (if crowdsale failed)
+	uint public tokensRefunded;
 
 	// address where funds are collected
 	address public beneficiary;
@@ -42,6 +48,9 @@ contract Crowdsale {
 
 	// how many successful transactions (with tokens being send back) do we have
 	uint public transactions;
+
+	// how many refund transactions (in exchange for tokens) made (if crowdsale failed)
+	uint public refunds;
 
 	function Crowdsale(
 		uint _offset,
@@ -73,10 +82,28 @@ contract Crowdsale {
 		beneficiary = _beneficiary;
 
 		// link tokens, owned by a crowdsale
-		token = Transferable(_token);
+		token = ERC20(_token);
 	}
 
-	function() payable {
+	function softCapReached() constant external returns (bool) {
+		return collected >= softCap;
+	}
+
+	function hardCapReached() constant external returns (bool) {
+		return collected >= hardCap;
+	}
+
+	function progressByValue() constant external returns (uint) {
+		return 100 * collected / hardCap; // TODO: allow to change the precision
+	}
+
+	function progressInTime() constant external returns (uint) {
+		return 100 * (block.number - offset) / length; // TODO: allow to change the precision
+	}
+
+	// accepts crowdsale investment, requires
+	// crowdsale to be running and not reached its goal
+	function invest() payable {
 		// perform validations
 		require(block.number >= offset);
 		require(block.number <= offset + length);
@@ -116,7 +143,52 @@ contract Crowdsale {
 		collected += value;
 		tokensSold += tokens;
 		transactions++;
+	}
 
+	// refunds an investor of crowdsale has failed,
+	// requires investor to allow token transfer back to crowdsale
+	function refund() payable {
+		// perform validations
+		require(block.number > offset + length); // crowdsale ended
+		require(collected < softCap); // crowdsale failed
+
+		// call 'sender' nicely - investor
+		address investor = msg.sender;
+
+		// find out how much tokens should be refunded
+		uint tokens = token.allowance(investor, this);
+
+		// calculate refund amount
+		uint refundValue = tokens * rate;
+
+		// additional validations
+		require(tokens > 0);
+		require(refundValue <= balance);
+
+		// transfer the tokens back
+		token.transferFrom(investor, this, tokens);
+
+		// make a refund
+		investor.transfer(refundValue + msg.value);
+
+		// update crowdsale status
+		balance -= refundValue;
+		refunded += refundValue;
+		tokensRefunded += tokens;
+		refunds++;
+	}
+
+	// performs an investment or a refund,
+	// depending on the crowdsale status
+	function() payable {
+		if(block.number <= offset + length) {
+			// crowdsale is running, invest
+			invest();
+		}
+		else {
+			// crowdsale ended, try to refund
+			refund();
+		}
 	}
 
 }
