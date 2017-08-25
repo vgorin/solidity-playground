@@ -1,4 +1,4 @@
-var ada = web3.toWei(1, "ada");
+var ada = web3.toWei(1, "kwei");
 var finney = web3.toWei(1, "finney");
 var ether = web3.toWei(1, "ether");
 var einstein = web3.toWei(1, "grand");
