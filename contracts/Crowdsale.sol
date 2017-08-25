@@ -7,7 +7,7 @@ import './ERC20.sol';
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet
+ * on a token per ETH rate. Funds collected are forwarded to beneficiary
  * as they arrive.
  */
 contract Crowdsale {
@@ -85,12 +85,29 @@ contract Crowdsale {
 		token = ERC20(_token);
 	}
 
+/*
 	function softCapReached() constant external returns (bool) {
 		return collected >= softCap;
 	}
 
 	function hardCapReached() constant external returns (bool) {
 		return collected >= hardCap;
+	}
+
+	function hasStarted() constant external returns (bool) {
+		return block.number >= offset;
+	}
+
+	function hasEnded() constant external returns (bool) {
+		return block.number >= offset + length || collected >= hardCap;
+	}
+
+	function isRunning() constant external returns (bool) {
+		return block.number >= offset && block.number < offset + length && collected < hardCap;
+	}
+
+	function isRunningSuccessfully() constant external returns (bool) {
+		return block.number >= offset && block.number < offset + length && collected < hardCap && collected >= softCap;
 	}
 
 	function progressByValue() constant external returns (uint) {
@@ -100,13 +117,15 @@ contract Crowdsale {
 	function progressInTime() constant external returns (uint) {
 		return 100 * (block.number - offset) / length; // TODO: allow to change the precision
 	}
+*/
 
 	// accepts crowdsale investment, requires
 	// crowdsale to be running and not reached its goal
 	function invest() payable {
 		// perform validations
-		require(block.number >= offset);
-		require(block.number <= offset + length);
+		require(block.number >= offset); // crowdsale started
+		require(block.number < offset + length); // crowdsale has not ended
+		require(collected + rate <= hardCap); // its still possible to buy at least 1 token
 		require(msg.value >= rate); // this also ensures buying at least one token
 
 		// call 'sender' nicely - investor
@@ -119,7 +138,11 @@ contract Crowdsale {
 		uint value = tokens * rate;
 
 		// ensure we are not crossing the hardCap
-		require(value + collected <= hardCap);
+		if(value + collected > hardCap) {
+			value = hardCap - collected;
+			tokens = value / rate;
+			value = tokens * rate;
+		}
 
 		// transfer tokens to investor
 		token.transfer(investor, tokens);
@@ -149,7 +172,7 @@ contract Crowdsale {
 	// requires investor to allow token transfer back to crowdsale
 	function refund() payable {
 		// perform validations
-		require(block.number > offset + length); // crowdsale ended
+		require(block.number >= offset + length); // crowdsale ended
 		require(collected < softCap); // crowdsale failed
 
 		// call 'sender' nicely - investor
@@ -181,7 +204,7 @@ contract Crowdsale {
 	// performs an investment or a refund,
 	// depending on the crowdsale status
 	function() payable {
-		if(block.number <= offset + length) {
+		if(block.number < offset + length) {
 			// crowdsale is running, invest
 			invest();
 		}
