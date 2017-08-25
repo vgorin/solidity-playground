@@ -50,8 +50,8 @@ module.exports = function(deployer, network) {
 	var tokenSupply = shannon; // create 10^9 tokens
 	var crowdsaleAmount = ada; // crowdsale only 10^3 tokens
 
-	console.log("deploying token...");
 /*
+	console.log("deploying token...");
 	deployer.deploy(
 		Token,
 		"shannon",
