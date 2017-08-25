@@ -77,10 +77,10 @@ module.exports = function(deployer, network) {
 			console.log("crowdsale deployed, address: " + Crowdsale.address);
 			console.log("transferring " + crowdsaleAmount + " the tokens to crowdsale...");
 			Token.at(tokenAddress).transfer(Crowdsale.address, crowdsaleAmount).then(function(result) {
-				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully transferred to " + Crowdsale.address);
+				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully transferred to crowdsale " + Crowdsale.address);
 				// console.log(result); // too much output
 			}).catch(function(e) {
-				console.error("ERROR! unable to transfer " + crowdsaleAmount + " tokens (" + tokenAddress + ") to " + Crowdsale.address);
+				console.error("ERROR! unable to transfer " + crowdsaleAmount + " tokens (" + tokenAddress + ") to crowdsale " + Crowdsale.address);
 				console.error(e);
 			});
 		});
