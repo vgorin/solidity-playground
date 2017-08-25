@@ -8,7 +8,7 @@ var account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
 var account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
 var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
-var token0 = '0x886f2a6a9fd8130b776c63adfc5e92ff4ed8d933';
+var token0 = '0x049277c464f357912f95cc5e4b6627d4bdf947f4';
 
 /*
 var ValueSplitter = artifacts.require("./ValueSplitter.sol");
@@ -51,6 +51,7 @@ module.exports = function(deployer, network) {
 	var crowdsaleAmount = ada; // crowdsale only 10^3 tokens
 
 	console.log("deploying token...");
+/*
 	deployer.deploy(
 		Token,
 		"shannon",
@@ -58,7 +59,9 @@ module.exports = function(deployer, network) {
 		0,	// tokens are indivisible
 		tokenSupply
 	).then(function() {
-		console.log("token deployed, address: " + Token.address);
+*/
+		var tokenAddress = token0; // Token.address;
+		console.log("token deployed, address: " + tokenAddress);
 		console.log("deploying crowdsale...");
 		deployer.deploy(
 			Crowdsale,
@@ -68,18 +71,18 @@ module.exports = function(deployer, network) {
 			10 * ether,		// hard cap
 			ether,			// quantum
 			10 * finney,	// token price
-			Token.address,
-			account1
+			tokenAddress,	// token to sell
+			account1		// beneficiary
 		).then(function() {
 			console.log("crowdsale deployed, address: " + Crowdsale.address);
 			console.log("transferring " + crowdsaleAmount + " the tokens to crowdsale...");
-			Token.at(Token.address).transfer(Crowdsale.address, crowdsaleAmount).then(function(result) {
-				console.log(crowdsaleAmount + " tokens (" + Token.address + ") successfully transferred to " + Crowdsale.address);
+			Token.at(tokenAddress).transfer(Crowdsale.address, crowdsaleAmount).then(function(result) {
+				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully transferred to " + Crowdsale.address);
 				// console.log(result); // too much output
 			}).catch(function(e) {
-				console.error("ERROR! unable to transfer " + crowdsaleAmount + " tokens (" + Token.address + ") to " + Crowdsale.address);
+				console.error("ERROR! unable to transfer " + crowdsaleAmount + " tokens (" + tokenAddress + ") to " + Crowdsale.address);
 				console.error(e);
 			});
 		});
-	});
+//	});
 };
