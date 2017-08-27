@@ -45,11 +45,11 @@ contract Crowdsale {
 	// how much value refunded (if crowdsale failed)
 	uint public refunded;
 
-	// how much tokens released to investors
-	uint public tokensReleased;
+	// how much tokens issued to investors
+	uint public tokensIssued;
 
-	// how much tokens refunded (if crowdsale failed)
-	uint public tokensRefunded;
+	// how much tokens redeemed and refunded (if crowdsale failed)
+	uint public tokensRedeemed;
 
 	// how many successful transactions (with tokens being send back) do we have
 	uint public transactions;
@@ -138,7 +138,7 @@ contract Crowdsale {
 
 		// update crowdsale status
 		collected += value;
-		tokensReleased += tokens;
+		tokensIssued += tokens;
 		transactions++;
 	}
 
@@ -170,14 +170,14 @@ contract Crowdsale {
 
 		// update crowdsale status
 		refunded += refundValue;
-		tokensRefunded += tokens;
+		tokensRedeemed += tokens;
 		refunds++;
 	}
 
 	// sends all the value to the beneficiary
 	function withdraw() payable {
 		// perform validations
-		require(creator == msg.sender); // only beneficiary or creator can initiate this call
+		require(creator == msg.sender); // only creator can initiate this call
 		require(collected >= softCap); // crowdsale must be successful
 		require(this.balance > 0); // there should be something to transfer
 
