@@ -1,6 +1,7 @@
 pragma solidity ^0.4.11;
 
 import './ERC20.sol';
+import './Transferable.sol';
 
 /**
  * @title Crowdsale
@@ -12,7 +13,7 @@ import './ERC20.sol';
  */
 contract Crowdsale {
 	// address where funds are collected
-	address public beneficiary;
+	Transferable public beneficiary;
 
 	// contract creator, owner of the contract
 	// creator is also supplier of tokens
@@ -60,7 +61,6 @@ contract Crowdsale {
 	// events to log
 	event InvestmentAccepted(address indexed holder, uint tokens, uint value);
 	event RefundIssued(address indexed holder, uint tokens, uint value);
-	event WithdrawalPerformed(address indexed beneficiary, uint value);
 
 	function Crowdsale(
 		uint _offset,
@@ -69,7 +69,7 @@ contract Crowdsale {
 		uint _hardCap,
 		uint _quantum,
 		uint _rate,
-		address _beneficiary,
+		Transferable _beneficiary,
 		address _token
 	) {
 		// validate crowdsale settings (inputs)
@@ -191,9 +191,6 @@ contract Crowdsale {
 
 		// perform the transfer
 		beneficiary.transfer(value);
-
-		// log an event
-		WithdrawalPerformed(beneficiary, value);
 	}
 
 	// performs an investment, refund or withdrawal,
