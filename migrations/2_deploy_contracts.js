@@ -65,7 +65,7 @@ module.exports = function(deployer, network) {
 		console.log("deploying crowdsale...");
 		deployer.deploy(
 			Crowdsale,
-			web3.eth.blockNumber,	// crowdsale start block - current block
+			web3.eth.blockNumber + 1,	// crowdsale start block is next block
 			21,						// crowdsale ends in 5min (21 blocks)
 			3 * ether,		// soft cap
 			10 * ether,		// hard cap
@@ -75,17 +75,21 @@ module.exports = function(deployer, network) {
 			account1		// beneficiary
 		).then(function() {
 			console.log("crowdsale deployed, address: " + Crowdsale.address);
-			console.log("transferring " + crowdsaleAmount + " tokens to crowdsale...");
-			Token.at(tokenAddress).transfer(
+			console.log("approving transfer of " + crowdsaleAmount + " tokens by crowdsale...");
+			Token.at(tokenAddress).approve(
 				Crowdsale.address,
 				crowdsaleAmount
 			).then(function(result) {
-				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully transferred to crowdsale " + Crowdsale.address);
+				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully approved for transfer by crowdsale " + Crowdsale.address);
 				// console.log(result); // too much output
 			}).catch(function(e) {
-				console.error("ERROR! unable to transfer " + crowdsaleAmount + " tokens (" + tokenAddress + ") to crowdsale " + Crowdsale.address);
+				console.error("ERROR! Unable to approve transfer of " + crowdsaleAmount + " tokens (" + tokenAddress + ") by crowdsale " + Crowdsale.address);
 				console.error(e);
 			});
+		}).catch(function(e) {
+			console.error("ERROR! Crowdsale deployment failed!");
+			console.error(e);
 		});
 //	});
 };
+

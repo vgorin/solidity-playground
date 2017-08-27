@@ -14,6 +14,10 @@ contract Crowdsale {
 	// address where funds are collected
 	address public beneficiary;
 
+	// contract creator, owner of the contract
+	// creator is also supplier of tokens
+	address public creator;
+
 	// The token being sold
 	ERC20 public token;
 
@@ -35,9 +39,6 @@ contract Crowdsale {
 	// crowdsale maximum goal
 	uint public hardCap;
 
-	// current contract balance
-	uint public balance;
-
 	// how much value collected (funds raised)
 	uint public collected;
 
@@ -56,7 +57,7 @@ contract Crowdsale {
 	// how many refund transactions (in exchange for tokens) made (if crowdsale failed)
 	uint public refunds;
 
-	// events
+	// events to log
 	event GoalReached(uint amountRaised);
 	event SoftCapReached(uint softCap);
 	event InvestementAccepted(address indexed holder, uint256 tokenAmount, uint256 etherAmount);
@@ -73,11 +74,12 @@ contract Crowdsale {
 		address _beneficiary
 	) {
 		// validate crowdsale settings (inputs)
-		require(_offset > 0);
+		// require(_offset > 0); // TODO: check if offset is not in the past?
 		require(_length > 0);
-		require(_softCap > 0);
-		require(_hardCap > _softCap);
-		require(_quantum > 0);
+		// softCap can be anything, zero means crowdsale doesn't fail
+		// TODO: support zero hardCap (unlimited crowdsale)
+		require(_hardCap > _softCap); // hardCap must be greater then softCap
+		// quantum can be anything, zero means no accumulation
 		require(_rate > 0);
 		require(_token != address(0));
 		require(_beneficiary != address(0));
@@ -90,9 +92,10 @@ contract Crowdsale {
 		quantum = _quantum;
 		rate = _rate;
 		beneficiary = _beneficiary;
+		creator = msg.sender;
 
 		// link tokens, tokens are not owned by a crowdsale
-		// should be transferred to crowdsale after deployment
+		// should be approved for transfer by crowdsale after the deployment
 		token = ERC20(_token);
 	}
 
@@ -103,7 +106,7 @@ contract Crowdsale {
 		require(block.number >= offset); // crowdsale started
 		require(block.number < offset + length); // crowdsale has not ended
 		require(collected + rate <= hardCap); // its still possible to buy at least 1 token
-		require(msg.value >= rate); // this also ensures buying at least one token
+		require(msg.value >= rate); // value sent is enough to buy at least one token
 
 		// call 'sender' nicely - investor
 		address investor = msg.sender;
@@ -122,18 +125,12 @@ contract Crowdsale {
 		}
 
 		// transfer tokens to investor
-		token.transfer(investor, tokens);
+		token.transferFrom(creator, investor, tokens);
 
 		// accumulate the value or transfer it to beneficiary
-		if(value + collected < softCap || value + balance < quantum) {
-			// accumulate
-			balance += value;
-		}
-		else {
+		if(value + collected >= softCap && value + this.balance >= quantum) {
 			// transfer all the value to beneficiary
-			beneficiary.transfer(value + balance);
-			// set balance to zero
-			balance = 0;
+			beneficiary.transfer(value + this.balance);
 		}
 
 		// transfer the change to investor
@@ -145,8 +142,8 @@ contract Crowdsale {
 		transactions++;
 	}
 
-	// refunds an investor of crowdsale has failed,
-	// requires investor to allow token transfer back to crowdsale
+	// refunds an investor of failed crowdsale,
+	// requires investor to allow token transfer back
 	function refund() payable {
 		// perform validations
 		require(block.number >= offset + length); // crowdsale ended
@@ -163,16 +160,15 @@ contract Crowdsale {
 
 		// additional validations
 		require(tokens > 0);
-		require(refundValue <= balance);
+		require(refundValue <= this.balance);
 
 		// transfer the tokens back
-		token.transferFrom(investor, this, tokens);
+		token.transferFrom(investor, creator, tokens);
 
 		// make a refund
 		investor.transfer(refundValue + msg.value);
 
 		// update crowdsale status
-		balance -= refundValue;
 		refunded += refundValue;
 		tokensRefunded += tokens;
 		refunds++;
@@ -181,12 +177,12 @@ contract Crowdsale {
 	// sends all the value to the beneficiary
 	function withdraw() payable {
 		// perform validations
-		require(beneficiary == msg.sender); // only beneficiary can initiate this call
+		require(creator == msg.sender); // only beneficiary or creator can initiate this call
 		require(collected >= softCap); // crowdsale must be successful
-		require(balance > 0); // there should be something to transfer
+		require(this.balance > 0); // there should be something to transfer
 
 		// perform the transfer
-		beneficiary.transfer(msg.value + balance);
+		beneficiary.transfer(msg.value + this.balance);
 	}
 
 	// performs an investment, refund or withdrawal,
