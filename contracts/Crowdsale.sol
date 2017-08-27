@@ -70,8 +70,8 @@ contract Crowdsale {
 		uint _hardCap,
 		uint _quantum,
 		uint _rate,
-		address _token,
-		address _beneficiary
+		address _beneficiary,
+		address _token
 	) {
 		// validate crowdsale settings (inputs)
 		// require(_offset > 0); // TODO: check if offset is not in the past?
@@ -81,8 +81,8 @@ contract Crowdsale {
 		require(_hardCap > _softCap); // hardCap must be greater then softCap
 		// quantum can be anything, zero means no accumulation
 		require(_rate > 0);
-		require(_token != address(0));
 		require(_beneficiary != address(0));
+		require(_token != address(0));
 
 		// setup crowdsale settings
 		offset = _offset;
@@ -125,16 +125,16 @@ contract Crowdsale {
 		}
 
 		// transfer tokens to investor
-		require(token.transfer(investor, tokens));
-
-		// accumulate the value or transfer it to beneficiary
-		if(value + collected >= softCap && value + this.balance >= quantum) {
-			// transfer all the value to beneficiary
-			require(beneficiary.transfer(value + this.balance));
-		}
+		token.transfer(investor, tokens);
 
 		// transfer the change to investor
-		require(investor.transfer(msg.value - value));
+		investor.transfer(msg.value - value);
+
+		// accumulate the value or transfer it to beneficiary
+		if(value + collected >= softCap && this.balance >= quantum) {
+			// transfer all the value to beneficiary
+			beneficiary.transfer(this.balance);
+		}
 
 		// update crowdsale status
 		collected += value;
@@ -163,10 +163,10 @@ contract Crowdsale {
 		require(refundValue <= this.balance);
 
 		// transfer the tokens back
-		require(token.transferFrom(investor, this, tokens));
+		token.transferFrom(investor, this, tokens);
 
 		// make a refund
-		require(investor.transfer(refundValue + msg.value));
+		investor.transfer(refundValue + msg.value);
 
 		// update crowdsale status
 		refunded += refundValue;
@@ -182,7 +182,7 @@ contract Crowdsale {
 		require(this.balance > 0); // there should be something to transfer
 
 		// perform the transfer
-		require(beneficiary.transfer(msg.value + this.balance));
+		beneficiary.transfer(this.balance);
 	}
 
 	// performs an investment, refund or withdrawal,

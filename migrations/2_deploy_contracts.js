@@ -65,25 +65,26 @@ module.exports = function(deployer, network) {
 		console.log("deploying crowdsale...");
 		deployer.deploy(
 			Crowdsale,
-			web3.eth.blockNumber + 1,	// crowdsale start block is next block
+			web3.eth.blockNumber,	// crowdsale start block is next block
 			21,						// crowdsale ends in 5min (21 blocks)
 			3 * ether,		// soft cap
 			10 * ether,		// hard cap
 			ether,			// quantum
 			10 * finney,	// token price
-			tokenAddress,	// token to sell
-			account1		// beneficiary
+			account1,		// beneficiary
+			tokenAddress	// token to sell
 		).then(function() {
-			console.log("crowdsale deployed, address: " + Crowdsale.address);
+			var crowdsaleAddress = Crowdsale.address;
+			console.log("crowdsale deployed, address: " + crowdsaleAddress);
 			console.log("allocating " + crowdsaleAmount + " tokens for crowdsale...");
 			Token.at(tokenAddress).transfer(
-				Crowdsale.address,
+				crowdsaleAddress,
 				crowdsaleAmount
 			).then(function(result) {
-				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully allocated for crowdsale " + Crowdsale.address);
+				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully allocated for crowdsale " + crowdsaleAddress);
 				// console.log(result); // too much output
 			}).catch(function(e) {
-				console.error("ERROR! Unable to allocate " + crowdsaleAmount + " tokens (" + tokenAddress + ") for crowdsale " + Crowdsale.address);
+				console.error("ERROR! Unable to allocate " + crowdsaleAmount + " tokens (" + tokenAddress + ") for crowdsale " + crowdsaleAddress);
 				console.error(e);
 			});
 		}).catch(function(e) {
