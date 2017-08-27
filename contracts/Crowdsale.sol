@@ -125,7 +125,7 @@ contract Crowdsale {
 		}
 
 		// transfer tokens to investor
-		token.transferFrom(creator, investor, tokens);
+		token.transfer(investor, tokens);
 
 		// accumulate the value or transfer it to beneficiary
 		if(value + collected >= softCap && value + this.balance >= quantum) {
@@ -163,7 +163,7 @@ contract Crowdsale {
 		require(refundValue <= this.balance);
 
 		// transfer the tokens back
-		token.transferFrom(investor, creator, tokens);
+		token.transferFrom(investor, this, tokens);
 
 		// make a refund
 		investor.transfer(refundValue + msg.value);

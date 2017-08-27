@@ -75,15 +75,15 @@ module.exports = function(deployer, network) {
 			account1		// beneficiary
 		).then(function() {
 			console.log("crowdsale deployed, address: " + Crowdsale.address);
-			console.log("approving transfer of " + crowdsaleAmount + " tokens by crowdsale...");
-			Token.at(tokenAddress).approve(
+			console.log("allocating " + crowdsaleAmount + " tokens for crowdsale...");
+			Token.at(tokenAddress).transfer(
 				Crowdsale.address,
 				crowdsaleAmount
 			).then(function(result) {
-				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully approved for transfer by crowdsale " + Crowdsale.address);
+				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully allocated for crowdsale " + Crowdsale.address);
 				// console.log(result); // too much output
 			}).catch(function(e) {
-				console.error("ERROR! Unable to approve transfer of " + crowdsaleAmount + " tokens (" + tokenAddress + ") by crowdsale " + Crowdsale.address);
+				console.error("ERROR! Unable to allocate " + crowdsaleAmount + " tokens (" + tokenAddress + ") for crowdsale " + Crowdsale.address);
 				console.error(e);
 			});
 		}).catch(function(e) {
