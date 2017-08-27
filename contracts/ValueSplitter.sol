@@ -1,11 +1,13 @@
 pragma solidity ^0.4.11;
 
+import './Transferable.sol';
+
 // the contract splits an incoming value and sends its portions to the addresses provided
 contract ValueSplitter {
 	// wallet0 will receive numerator/denominator fraction of the funds
-	address public wallet0;
+	Transferable public wallet0;
 	// wallet1 will receive the rest of the funds
-	address public wallet1;
+	Transferable public wallet1;
 
 	// minimum amount of funds which contract is allowed to process in one transaction
 	// can be useful to save on transaction fees
@@ -29,8 +31,8 @@ contract ValueSplitter {
 	uint internal currentDenominator = 1;
 
 	function ValueSplitter(
-		address _wallet0,
-		address _wallet1,
+		Transferable _wallet0,
+		Transferable _wallet1,
 		uint _quantum,
 		uint[] _thresholds,
 		uint[] _numerators,
