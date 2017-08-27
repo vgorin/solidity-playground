@@ -16,7 +16,7 @@ contract Crowdsale {
 
 	// contract creator, owner of the contract
 	// creator is also supplier of tokens
-	address public creator;
+	address creator;
 
 	// The token being sold
 	ERC20 public token;
@@ -31,7 +31,7 @@ contract Crowdsale {
 	uint public length;
 
 	// minimum amount of value to transfer to beneficiary in automatic mode
-	uint public quantum;
+	uint quantum;
 
 	// crowdsale minimum goal
 	uint public softCap;
@@ -46,22 +46,21 @@ contract Crowdsale {
 	uint public refunded;
 
 	// how much tokens issued to investors
-	uint public tokensIssued;
+	//uint public tokensIssued;
 
 	// how much tokens redeemed and refunded (if crowdsale failed)
-	uint public tokensRedeemed;
+	//uint public tokensRedeemed;
 
 	// how many successful transactions (with tokens being send back) do we have
-	uint public transactions;
+	//uint public transactions;
 
 	// how many refund transactions (in exchange for tokens) made (if crowdsale failed)
-	uint public refunds;
+	//uint public refunds;
 
 	// events to log
-	event GoalReached(uint amountRaised);
-	event SoftCapReached(uint softCap);
-	event InvestementAccepted(address indexed holder, uint256 tokenAmount, uint256 etherAmount);
-	event RefundIssued(address indexed holder, uint256 amount);
+	event InvestmentAccepted(address indexed holder, uint tokens, uint value);
+	event RefundIssued(address indexed holder, uint tokens, uint value);
+	event WithdrawalPerformed(address indexed beneficiary, uint value);
 
 	function Crowdsale(
 		uint _offset,
@@ -138,8 +137,11 @@ contract Crowdsale {
 
 		// update crowdsale status
 		collected += value;
-		tokensIssued += tokens;
-		transactions++;
+		//tokensIssued += tokens;
+		//transactions++;
+
+		// log an event
+		InvestmentAccepted(investor, tokens, value);
 	}
 
 	// refunds an investor of failed crowdsale,
@@ -170,8 +172,11 @@ contract Crowdsale {
 
 		// update crowdsale status
 		refunded += refundValue;
-		tokensRedeemed += tokens;
-		refunds++;
+		//tokensRedeemed += tokens;
+		//refunds++;
+
+		// log an event
+		RefundIssued(investor, tokens, refundValue);
 	}
 
 	// sends all the value to the beneficiary
@@ -181,8 +186,14 @@ contract Crowdsale {
 		require(collected >= softCap); // crowdsale must be successful
 		require(this.balance > 0); // there should be something to transfer
 
+		// how much to withdraw (entire balance obviously)
+		uint value = this.balance;
+
 		// perform the transfer
-		beneficiary.transfer(this.balance);
+		beneficiary.transfer(value);
+
+		// log an event
+		WithdrawalPerformed(beneficiary, value);
 	}
 
 	// performs an investment, refund or withdrawal,
@@ -193,11 +204,12 @@ contract Crowdsale {
 			invest();
 		}
 		else if(collected < softCap) {
-			// crowdsale ended, try to refund
+			// crowdsale failed, try to refund
 			refund();
 		}
 		else {
-			// maybe poor beneficiary is begging for change...
+			// crowdsale is successful, investments are not accepted anymore
+			// but maybe poor beneficiary is begging for change...
 			withdraw();
 		}
 	}
