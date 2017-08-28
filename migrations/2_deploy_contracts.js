@@ -12,16 +12,8 @@ var token0 = '0xe3a303f644221b1b805cc8a6fa8877da7ae4b668';
 
 /*
 var ValueSplitter = artifacts.require("./ValueSplitter.sol");
-var ValueProxy = artifacts.require("./ValueProxy.sol");
-var ValueAccumulator = artifacts.require("./ValueAccumulator.sol");
 
 module.exports = function(deployer, network) {
-	deployer.deploy(ValueAccumulator).then(function() {
-		deployer.deploy(ValueProxy, ValueAccumulator.address);
-	});
-	deployer.deploy(ValueProxy, account1).then(function() {
-		deployer.deploy(ValueProxy, ValueProxy.address);
-	});
 	deployer.deploy(
 		ValueSplitter,
 		account2,
@@ -34,7 +26,7 @@ module.exports = function(deployer, network) {
 	deployer.deploy(
 		ValueSplitter,
 		account1,
-		'0xdab70c0fa14076c7e2341fb341062a11df8e4a68',
+		account2,
 		0,
 		[2 * ether, 10 * ether, 0],
 		[19, 49, 99],
@@ -61,22 +53,25 @@ module.exports = function(deployer, network) {
 	).then(function() {
 */
 		var tokenAddress = token0; //Token.address;
-		console.log("token deployed, address: " + tokenAddress);
-		console.log("deploying crowdsale...");
+		// console.log("token deployed, address: " + tokenAddress);
+		// console.log("deploying crowdsale...");
 		deployer.deploy(
 			Crowdsale,
 			web3.eth.blockNumber,	// crowdsale start block is next block
 			21,						// crowdsale ends in 5min (21 blocks)
+			10 * finney,	// token price
 			3 * ether,		// soft cap
 			10 * ether,		// hard cap
 			ether,			// quantum
-			10 * finney,	// token price
 			account1,		// beneficiary
-			tokenAddress	// token to sell
+			tokenAddress,	// token to sell (used for open crowdsale)
+			"CML0",	// token symbol (used for closed crowdsale)
+			"CML Token 0",	// token name (used for closed crowdsale)
+			0 	// token decimals (used for closed crowdsale)
 		).then(function() {
 			var crowdsaleAddress = Crowdsale.address;
-			console.log("crowdsale deployed, address: " + crowdsaleAddress);
-			console.log("allocating " + crowdsaleAmount + " tokens for crowdsale...");
+			// console.log("crowdsale deployed, address: " + crowdsaleAddress);
+			// console.log("allocating " + crowdsaleAmount + " tokens for crowdsale...");
 			Token.at(tokenAddress).transfer(
 				crowdsaleAddress,
 				crowdsaleAmount

@@ -17,7 +17,7 @@ contract ConfigurableERC20 is FixedERC20 {
 		uint _totalSupply
 	) FixedERC20(_totalSupply) {
 		// perform validations
-		assert(decimals <= 18);  // wei
+		require(decimals <= 18);  // wei
 
 		// assign constants
 		symbol = _symbol;
