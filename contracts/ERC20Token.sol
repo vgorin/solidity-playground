@@ -51,7 +51,7 @@ contract ERC20Token is ERC20 {
 	 * @dev Transfer tokens from one address to another
 	 * @param _from address The address which you want to send tokens from
 	 * @param _to address The address which you want to transfer to
-	 * @param _value uint the amout of tokens to be transfered
+	 * @param _value uint the amount of tokens to be transfered
 	 */
 	// Send _value amount of tokens from address _from to address _to
 	// The transferFrom method is used for a withdraw workflow, allowing contracts to send
@@ -92,7 +92,7 @@ contract ERC20Token is ERC20 {
 		//  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
 		require((_value == 0) || (allowed[msg.sender][_spender] == 0));
 
-		// perform the opertaion
+		// perform the operation
 		allowed[msg.sender][_spender] = _value;
 
 		// log the successful approval
