@@ -45,6 +45,7 @@ contract ValueShare {
 		uint n = beneficiaries.length; // number of beneficiaries
 		uint[] memory values = new uint[](n); // value to send to each of beneficiaries
 
+		// process thresholds
 		for(
 			uint current = transferred; // current active threshold
 			thresholds[idx] != 0 && transferred + value > thresholds[idx];
