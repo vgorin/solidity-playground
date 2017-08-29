@@ -1,28 +1,26 @@
 pragma solidity ^0.4.11;
 
-import './Transfers.sol';
+import './SharedTransfer.sol';
 
 // shares incoming value between the beneficiaries according to their shares
 contract ValueShare {
-	address[] beneficiaries;
-	uint[] shares;
-	uint[] thresholds;
-	uint quantum;
+	// using SharedTransfer library for Transfer struct
+	using SharedTransfer for SharedTransfer.Transfer;
 
-	// total amount of transferred value, used with thresholds
-	uint public transferred;
+	// transfer structure
+	SharedTransfer.Transfer t;
+
+	// quantization
+	uint quantum;
 
 	// beneficiaries - an array of beneficiary addresses
 	// shares - their shares, shares[i] is beneficiaries[i] share
 	// thresholds - allows changing of the share proportion depending on amount of value processed
 	function ValueShare(address[] _beneficiaries, uint[] _shares, uint[] _thresholds, uint _quantum) {
 		// input validation
-		Transfers.validateSharedTransferConfig(_beneficiaries, _shares, _thresholds);
+		t = SharedTransfer.create(_beneficiaries, _shares, _thresholds);
 
-		// setup
-		beneficiaries = _beneficiaries;
-		shares = _shares;
-		thresholds = _thresholds;
+		// setup quantum
 		quantum = _quantum;
 	}
 
@@ -32,8 +30,8 @@ contract ValueShare {
 			return;
 		}
 
-		// updates transferred status
-		transferred += Transfers.sharedTransfer(beneficiaries, shares, thresholds, transferred, this.balance);
+		// perform the transfer
+		t.sharedTransfer(this.balance);
 	}
 
 }
