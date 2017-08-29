@@ -10,40 +10,19 @@ var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
 var token0 = '0xe3a303f644221b1b805cc8a6fa8877da7ae4b668';
 
-/*
-var ValueSplitter = artifacts.require("./ValueSplitter.sol");
-
-module.exports = function(deployer, network) {
-	deployer.deploy(
-		ValueSplitter,
-		account2,
-		account3,
-		0,
-		[0],
-		[4],
-		[5]
-	);
-	deployer.deploy(
-		ValueSplitter,
-		account1,
-		account2,
-		0,
-		[2 * ether, 10 * ether, 0],
-		[19, 49, 99],
-		[20, 50, 100]
-	);
-};
-*/
-
+var ValueShare = artifacts.require("./ValueShare.sol");
 var Token = artifacts.require("./ConfigurableERC20.sol");
 var Crowdsale = artifacts.require("./Crowdsale.sol");
 
 module.exports = function(deployer, network) {
-	var tokenSupply = shannon; // create 10^9 tokens
-	var crowdsaleAmount = ada; // crowdsale only 10^3 tokens
-
+	deployer.deploy(
+		ValueShare,
+		[account1, account2, account3],	// beneficiaries
+		[1, 1, 1],						// shares
+		[0],							// thresholds
+		0								// quantum
+	);
 /*
-	console.log("deploying token...");
 	deployer.deploy(
 		Token,
 		"CML",
@@ -51,10 +30,9 @@ module.exports = function(deployer, network) {
 		0,	// tokens are indivisible
 		tokenSupply
 	).then(function() {
-*/
-		var tokenAddress = token0; //Token.address;
-		// console.log("token deployed, address: " + tokenAddress);
-		// console.log("deploying crowdsale...");
+	var tokenSupply = shannon; // create 10^9 tokens
+	var crowdsaleAmount = ada; // crowdsale only 10^3 tokens
+	var tokenAddress = token0; //Token.address;
 		deployer.deploy(
 			Crowdsale,
 			web3.eth.blockNumber,	// crowdsale start block is next block
@@ -70,8 +48,6 @@ module.exports = function(deployer, network) {
 			0 	// token decimals (used for closed crowdsale)
 		).then(function() {
 			var crowdsaleAddress = Crowdsale.address;
-			// console.log("crowdsale deployed, address: " + crowdsaleAddress);
-			// console.log("allocating " + crowdsaleAmount + " tokens for crowdsale...");
 			Token.at(tokenAddress).transfer(
 				crowdsaleAddress,
 				crowdsaleAmount
@@ -86,6 +62,7 @@ module.exports = function(deployer, network) {
 			console.error("ERROR! Crowdsale deployment failed!");
 			console.error(e);
 		});
-//	});
+	});
+*/
 };
 
