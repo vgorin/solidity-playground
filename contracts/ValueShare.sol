@@ -7,8 +7,10 @@ contract ValueShare {
 	uint[] thresholds;
 	uint quantum;
 
+	// current threshold index
 	uint private idx;
 
+	// total amount of transferred value, used with thresholds
 	uint public transferred;
 
 	// beneficiaries - an array of beneficiary addresses
@@ -39,33 +41,59 @@ contract ValueShare {
 		}
 
 		// define auxiliary variables
-		uint i; // temporary variable for simple loops
-		uint share; // total share
 		uint value = this.balance; // total value to share
 		uint n = beneficiaries.length; // number of beneficiaries
 		uint[] memory values = new uint[](n); // value to send to each of beneficiaries
 
-		// calculate total share
-		for(i = 0; i < n; i++) {
-			share += shares[idx * n + i];
+		for(
+			uint current = transferred; // current active threshold
+			thresholds[idx] != 0 && transferred + value > thresholds[idx];
+			current = thresholds[idx++] // update both current threshold and idx
+		) {
+			// calculate each beneficiary value share in between thresholds
+			__split(n, values, thresholds[idx] - current);
 		}
 
-		// calculate each beneficiary value share
-		uint v = 0; // temp variable to fix rounding off discrepancy
-		for(i = 0; i < n; i++) {
-			values[i] = value / share * shares[i];
-			v += values[i];
-		}
-		// fix rounding off discrepancy
-		values[0] += value - v;
+		// all the thresholds are crossed, calculate the rest
+		__split(n, values, value - current + transferred);
 
 		// send the values
-		for(i = 0; i < n; i++) {
+		for(uint i = 0; i < n; i++) {
 			beneficiaries[i].transfer(values[i]);
 		}
 
 		// updates status
 		transferred += value;
+	}
+
+	// n - number of beneficiaries, values array length
+	// values - array to accumulate each beneficiary value share during current transfer
+	// value - total value during current round of transfer
+	function __split(uint n, uint[] memory values, uint value) internal {
+		// temporary variable for simple loops
+		uint i;
+
+		// temp variables to fix rounding off discrepancy
+		uint v0 = 0;
+		uint vi;
+
+		// total share
+		uint share = 0;
+
+		// calculate total share for current round
+		for(i = 0; i < n; i++) {
+			share += shares[idx * n + i];
+		}
+
+		// calculate each beneficiary value share
+		for(i = 0; i < n; i++) {
+			vi = value / share * shares[idx * n + i]; // i-th for current round
+			values[i] += vi; // increment beneficiary's share
+			v0 += vi; // total for current round
+		}
+
+		// fix rounding off discrepancy
+		values[0] += value - v0;
 	}
 
 }

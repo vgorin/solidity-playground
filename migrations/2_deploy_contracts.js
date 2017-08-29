@@ -18,9 +18,13 @@ module.exports = function(deployer, network) {
 	deployer.deploy(
 		ValueShare,
 		[account1, account2, account3],	// beneficiaries
-		[1, 1, 1],						// shares
-		[0],							// thresholds
-		0								// quantum
+		[
+			95, 4, 1,	// shares before 1 ether
+			245, 4, 1,	// shares before 2 ether
+			495, 4, 1	// shares after 2 ether
+		],
+		[ether, 2 * ether, 0],	// thresholds
+		0							// quantum
 	);
 /*
 	deployer.deploy(
