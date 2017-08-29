@@ -10,11 +10,14 @@ var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
 var token0 = '0xe3a303f644221b1b805cc8a6fa8877da7ae4b668';
 
+var Transfers = artifacts.require("./Transfers.sol");
 var ValueShare = artifacts.require("./ValueShare.sol");
 var Token = artifacts.require("./ConfigurableERC20.sol");
 var Crowdsale = artifacts.require("./Crowdsale.sol");
 
 module.exports = function(deployer, network) {
+	deployer.deploy(Transfers);
+	deployer.link(Transfers, ValueShare);
 	deployer.deploy(
 		ValueShare,
 		[account1, account2, account3],	// beneficiaries
