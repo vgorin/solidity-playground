@@ -51,9 +51,13 @@ contract ValueShare {
 		}
 
 		// calculate each beneficiary value share
+		uint v = 0; // temp variable to fix rounding off discrepancy
 		for(i = 0; i < n; i++) {
 			values[i] = value / share * shares[i];
+			v += values[i];
 		}
+		// fix rounding off discrepancy
+		values[0] += value - v;
 
 		// send the values
 		for(i = 0; i < n; i++) {
