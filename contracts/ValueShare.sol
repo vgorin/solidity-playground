@@ -4,7 +4,7 @@ import './lib/Transfers.sol';
 
 // shares incoming value between the beneficiaries according to their shares
 contract ValueShare {
-	// using SharedTransfer library for Transfer struct
+	// using Transfers library for Transfer struct
 	using Transfers for Transfers.Shared;
 
 	// transfer structure
