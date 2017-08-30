@@ -1,9 +1,11 @@
 pragma solidity ^0.4.11;
 
+import '../token/ERC20.sol';
+
 // Contains value transfer related utility functions
-library SharedTransfer {
+library Transfers {
 	// base structure for storing config and current state
-	struct Transfer {
+	struct Shared {
 		address[] beneficiaries; // config
 		uint[] shares; // config
 		uint[] thresholds; // config
@@ -12,7 +14,7 @@ library SharedTransfer {
 	}
 
 	// used to validate config parameters used in sharedTransfer
-	function create(address[] beneficiaries, uint[] shares, uint[] thresholds) internal returns (Transfer) {
+	function create(address[] beneficiaries, uint[] shares, uint[] thresholds) internal returns (Shared) {
 		// basic validation
 		require(beneficiaries.length > 0);
 		require(shares.length > 0);
@@ -34,12 +36,12 @@ library SharedTransfer {
 		}
 		require(thresholds[thresholds.length - 1] == 0);
 
-		// create config
-		return Transfer(beneficiaries, shares, thresholds, 0, 0);
+		// create shared transfer struct
+		return Shared(beneficiaries, shares, thresholds, 0, 0);
 	}
 
 	// transfers shares to beneficiaries according to parameters specified
-	function sharedTransfer(Transfer storage t, uint value) internal {
+	function transferValue(Shared storage t, uint value) internal {
 		// define auxiliary variables
 		uint n = t.beneficiaries.length; // number of beneficiaries
 		uint[] memory values = new uint[](n); // value to send to each of beneficiaries

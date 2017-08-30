@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 
-import './ERC20.sol';
-import './ConfigurableERC20.sol';
+import './token/ERC20.sol';
+import './token/ConfigurableERC20.sol';
 
 /**
  * @title Crowdsale
@@ -104,11 +104,10 @@ contract Crowdsale {
 		uint _decimals
 	) {
 		// validate crowdsale settings (inputs)
-		// require(_offset > 0); // TODO: check if offset is not in the past?
+		// require(_offset > 0); // we don't really care
 		require(_length > 0);
 		// softCap can be anything, zero means crowdsale doesn't fail
-		// TODO: support zero hardCap (unlimited crowdsale)
-		require(_hardCap > _softCap); // hardCap must be greater then softCap
+		require(_hardCap > _softCap || _hardCap == 0); // hardCap must be greater then softCap
 		// quantum can be anything, zero means no accumulation
 		require(_rate > 0);
 		require(_beneficiary != address(0));
@@ -136,7 +135,7 @@ contract Crowdsale {
 		// perform validations
 		require(block.number >= offset); // crowdsale started
 		require(block.number < offset + length); // crowdsale has not ended
-		require(collected + rate <= hardCap); // its still possible to buy at least 1 token
+		require(collected + rate <= hardCap || hardCap == 0); // its still possible to buy at least 1 token
 		require(msg.value >= rate); // value sent is enough to buy at least one token
 
 		// call 'sender' nicely - investor
@@ -149,7 +148,7 @@ contract Crowdsale {
 		uint value = tokens * rate;
 
 		// ensure we are not crossing the hardCap
-		if(value + collected > hardCap) {
+		if(value + collected > hardCap || hardCap == 0) {
 			value = hardCap - collected;
 			tokens = value / rate;
 			value = tokens * rate;
