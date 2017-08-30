@@ -255,7 +255,7 @@ contract Crowdsale {
 	// allocates token source, supports both open and closed crowdsales
 	function __allocateTokens(address _token, string _symbol, string _name, uint _decimals) internal {
 		// determine crowdsale type
-		open = token != address(0);
+		open = _token != address(0);
 
 		if(open) {
 			// link tokens, tokens are not owned by a crowdsale
