@@ -39,29 +39,29 @@ contract Crowdsale {
 	// creator is also supplier of tokens
 	address creator;
 
-	// how many token units a buyer gets per wei
-	uint public rate;
-
 	// crowdsale start block number
-	uint public offset;
+	uint offset;
 
 	// crowdsale length in blocks
-	uint public length;
+	uint length;
+
+	// how many token units a buyer gets per wei
+	uint rate;
+
+	// crowdsale minimum goal
+	uint softCap;
+
+	// crowdsale maximum goal
+	uint hardCap;
 
 	// minimum amount of value to transfer to beneficiary in automatic mode
 	uint quantum;
 
-	// crowdsale minimum goal
-	uint public softCap;
-
-	// crowdsale maximum goal
-	uint public hardCap;
-
 	// how much value collected (funds raised)
-	uint public collected;
+	uint collected;
 
 	// how much value refunded (if crowdsale failed)
-	uint public refunded;
+	uint refunded;
 
 	// how much tokens issued to investors
 	//uint public tokensIssued;
@@ -76,14 +76,20 @@ contract Crowdsale {
 	//uint public refunds;
 
 	// The token being sold
-	ERC20 public token;
+	ERC20 token;
 
 	// address where funds are collected
-	address public beneficiary;
+	address beneficiary;
+
+	// investor's mapping, required for reusable token crowdsales (open crowdsales)
+	mapping(address => uint) balances;
+
+	// if true - crowdsale is open, if false - closed (owns all the tokens)
+	bool open;
 
 	// events to log
-	event InvestmentAccepted(address indexed holder, uint tokens, uint value);
-	event RefundIssued(address indexed holder, uint tokens, uint value);
+//	event InvestmentAccepted(address indexed holder, uint tokens, uint value);
+//	event RefundIssued(address indexed holder, uint tokens, uint value);
 
 	// a crowdsale is defined by a set of parameters passed here
 	// make sure _offset + _length block is in the future in order for crowdsale to be operational
@@ -172,7 +178,7 @@ contract Crowdsale {
 		//transactions++;
 
 		// log an event
-		InvestmentAccepted(investor, tokens, value);
+//		InvestmentAccepted(investor, tokens, value);
 	}
 
 	// refunds an investor of failed crowdsale,
@@ -207,7 +213,7 @@ contract Crowdsale {
 		//refunds++;
 
 		// log an event
-		RefundIssued(investor, tokens, refundValue);
+//		RefundIssued(investor, tokens, refundValue);
 	}
 
 	// sends all the value to the beneficiary
@@ -248,7 +254,10 @@ contract Crowdsale {
 
 	// allocates token source, supports both open and closed crowdsales
 	function __allocateTokens(address _token, string _symbol, string _name, uint _decimals) internal {
-		if(_token != address(0)) {
+		// determine crowdsale type
+		open = token != address(0);
+
+		if(open) {
 			// link tokens, tokens are not owned by a crowdsale
 			// should be transferred to crowdsale after the deployment
 			token = ERC20(_token);
@@ -267,16 +276,30 @@ contract Crowdsale {
 
 	// transfers tokens to investor, validations are not required
 	function __issueTokens(address investor, uint tokens) internal {
+		if(open) {
+			// for open crowdsales we track investors balances
+			balances[investor] += tokens;
+		}
 		token.transfer(investor, tokens);
 	}
 
 	// calculates amount of tokens available to redeem from investor, validations are not required
 	function __redeemAmount(address investor) internal returns (uint amount) {
-		return token.allowance(investor, this);
+		uint allowance = token.allowance(investor, this);
+		if(open) {
+			// for open crowdsales we check previously tracked investor balance
+			uint balance = balances[investor];
+			return balance < allowance? balance: allowance;
+		}
+		return allowance;
 	}
 
 	// transfers tokens from investor, validations are not required
 	function __redeemTokens(address investor, uint tokens) internal {
+		if(open) {
+			// for open crowdsales we track investors balances
+			balances[investor] -= tokens;
+		}
 		token.transferFrom(investor, this, tokens);
 	}
 
