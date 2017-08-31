@@ -1,5 +1,7 @@
 var ada = web3.toWei(1, "kwei");		// 1000
+var babbage = web3.toWei(1, "mwei");	// 10^6
 var shannon = web3.toWei(1, "gwei");	// 10^9
+var szabo = web3.toWei(1, "szabo");		// 10^12
 var finney = web3.toWei(1, "finney");	// 10^15
 var ether = web3.toWei(1, "ether");		// 10^18
 var einstein = web3.toWei(1, "grand");	// 10^21
@@ -10,7 +12,7 @@ var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
 var accumulator = '0x650c2d51dd04a70f1223ca83eefeccc8dec72519';
 
-var token0 = '0xe3a303f644221b1b805cc8a6fa8877da7ae4b668';
+var token0 = '0xdbe4d5fd70493c159b5c15c1d9c7bf3afce838e1';
 
 var Transfers = artifacts.require("./lib/Transfers.sol");
 var Accumulator = artifacts.require("./SharedAccumulator.sol");
@@ -20,15 +22,30 @@ var Crowdsale = artifacts.require("./Crowdsale.sol");
 var Redemption = artifacts.require("./Redemption.sol");
 
 // crowdsale settings
-var length = 21; // crowdsale lasts for 5min (21 blocks)
-var rate = 10 * finney; // token price
-var softCap = 3 * ether;
-var hardCap = 10 * ether;
-var quantum = 0;
-var crowdsaleAmount = hardCap / rate; // crowdsale amount
-var tokenSupply = crowdsaleAmount; // create only corwdsale tokens
+var preSale = {
+	length: 21, // crowdsale lasts for 5min (21 blocks)
+	rate: 5 * finney, // token price
+	softCap: 0,
+	hardCap: ether,
+	quantum: 0,
+	amount: 200
+};
+
+// crowdsale settings
+var crowdsale = {
+	length: 21, // crowdsale lasts for 5min (21 blocks)
+	rate: 10 * finney, // token price
+	softCap: ether,
+	hardCap: 10 * ether,
+	quantum: 0,
+	amount: 1000
+};
+
+// total token supply
+var supply = preSale.amount + crowdsale.amount;
 
 module.exports = function(deployer, network) {
+/*
 	deployer.deploy(Transfers);
 	deployer.link(Transfers, Transfer);
 	deployer.deploy(
@@ -51,51 +68,57 @@ module.exports = function(deployer, network) {
 			495, 4, 1	// shares after 2 ether
 		],
 		[ether, 2 * ether, 0]	// thresholds
-	).then(function() {
-		var accumAddress = Accumulator.address;
-		deployer.deploy(
-			Token,
-			"CML",
-			"CML Token",
-			0,	// tokens are indivisible
-			tokenSupply
-		).then(function() {
-			var tokenAddress = token0; //Token.address;
-			deployer.deploy(
-				Crowdsale,
-				web3.eth.blockNumber,	// crowdsale start block is next block
-				length,					// crowdsale ends in 5min (21 blocks)
-				rate,			// token price
-				softCap,		// soft cap
-				hardCap,		// hard cap
-				quantum,		// quantum
-				accumAddress,	// beneficiary
-				tokenAddress,	// token to sell (used for open crowdsale)
-				"CML0",	// token symbol (used for closed crowdsale)
-				"CML Token 0",	// token name (used for closed crowdsale)
-				0 	// token decimals (used for closed crowdsale)
-			).then(function() {
-				var crowdsaleAddress = Crowdsale.address;
-				Token.at(tokenAddress).transfer(
-					crowdsaleAddress,
-					crowdsaleAmount
-				).then(function(result) {
-					console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully allocated for crowdsale " + crowdsaleAddress);
-					// console.log(result); // too much output
-				}).catch(function(e) {
-					console.error("ERROR! Unable to allocate " + crowdsaleAmount + " tokens (" + tokenAddress + ") for crowdsale " + crowdsaleAddress);
-					console.error(e);
-				});
-			}).catch(function(e) {
-				console.error("ERROR! Crowdsale deployment failed!");
-				console.error(e);
-			});
-			deployer.deploy(
-				Redemption,
-				rate,
-				tokenAddress
-			)
-		});
-	});
+	);
+*/
+
+/*
+	deployer.deploy(
+		Token,
+		"TK",
+		"Token",
+		0, // tokens are indivisible
+		supply
+	);
+*/
+
+	// deployCrowdsale(deployer, preSale);
+	// deployCrowdsale(deployer, crowdsale);
+
+	deployer.deploy(
+		Redemption,
+		20 * finney,
+		token0
+	);
 };
 
+function deployCrowdsale(deployer, crowdsale) {
+	deployer.deploy(
+		Crowdsale,
+		web3.eth.blockNumber,	// crowdsale start block is next block
+		crowdsale.length,					// crowdsale ends in 5min (21 blocks)
+		crowdsale.rate,			// token price
+		crowdsale.softCap,		// soft cap
+		crowdsale.hardCap,		// hard cap
+		crowdsale.quantum,		// quantum
+		account1,		// beneficiary
+		token0,	// token to sell (used for open crowdsale)
+		"",	// token symbol (used for closed crowdsale)
+		"",	// token name (used for closed crowdsale)
+		0 	// token decimals (used for closed crowdsale)
+	).then(function() {
+		var crowdsaleAddress = Crowdsale.address;
+		Token.at(token0).transfer(
+			crowdsaleAddress,
+			crowdsale.amount
+		).then(function(result) {
+			console.log(crowdsale.amount + " tokens (" + token0 + ") successfully allocated for crowdsale " + crowdsaleAddress);
+			// console.log(result); // too much output
+		}).catch(function(e) {
+			console.error("ERROR! Unable to allocate " + crowdsale.amount + " tokens (" + token0 + ") for crowdsale " + crowdsaleAddress);
+			console.error(e);
+		});
+	}).catch(function(e) {
+		console.error("ERROR! Crowdsale deployment failed!");
+		console.error(e);
+	});
+}
