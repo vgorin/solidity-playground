@@ -8,6 +8,8 @@ var account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
 var account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
 var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
+var accumulator = '0x650c2d51dd04a70f1223ca83eefeccc8dec72519';
+
 var token0 = '0xe3a303f644221b1b805cc8a6fa8877da7ae4b668';
 
 var Transfers = artifacts.require("./lib/Transfers.sol");
@@ -17,6 +19,7 @@ var Token = artifacts.require("./token/ConfigurableERC20.sol");
 var Crowdsale = artifacts.require("./Crowdsale.sol");
 
 module.exports = function(deployer, network) {
+/*
 	deployer.deploy(Transfers);
 	deployer.link(Transfers, Accumulator);
 	// deployer.link(Transfers, Transfer);
@@ -30,7 +33,6 @@ module.exports = function(deployer, network) {
 		],
 		[ether, 2 * ether, 0]	// thresholds
 	);
-/*
 	deployer.deploy(
 		Transfer,
 		[account1, account2, account3],	// beneficiaries
@@ -60,7 +62,7 @@ module.exports = function(deployer, network) {
 			3 * ether,		// soft cap
 			10 * ether,		// hard cap
 			ether,			// quantum
-			account1,		// beneficiary
+			accumulator,	// beneficiary
 			tokenAddress,	// token to sell (used for open crowdsale)
 			"CML0",	// token symbol (used for closed crowdsale)
 			"CML Token 0",	// token name (used for closed crowdsale)
