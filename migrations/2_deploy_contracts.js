@@ -11,25 +11,36 @@ var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 var token0 = '0xe3a303f644221b1b805cc8a6fa8877da7ae4b668';
 
 var Transfers = artifacts.require("./lib/Transfers.sol");
-var ValueShare = artifacts.require("./ValueShare.sol");
+var Accumulator = artifacts.require("./SharedAccumulator.sol");
+var Transfer = artifacts.require("./SharedTransfer.sol");
 var Token = artifacts.require("./token/ConfigurableERC20.sol");
 var Crowdsale = artifacts.require("./Crowdsale.sol");
 
 module.exports = function(deployer, network) {
 	deployer.deploy(Transfers);
-	deployer.link(Transfers, ValueShare);
+	deployer.link(Transfers, Accumulator);
+	// deployer.link(Transfers, Transfer);
 	deployer.deploy(
-		ValueShare,
+		Accumulator,
 		[account1, account2, account3],	// beneficiaries
 		[
 			95, 4, 1,	// shares before 1 ether
 			245, 4, 1,	// shares before 2 ether
 			495, 4, 1	// shares after 2 ether
 		],
-		[ether, 2 * ether, 0],	// thresholds
-		0						// quantum
+		[ether, 2 * ether, 0]	// thresholds
 	);
 /*
+	deployer.deploy(
+		Transfer,
+		[account1, account2, account3],	// beneficiaries
+		[
+			95, 4, 1,	// shares before 1 ether
+			245, 4, 1,	// shares before 2 ether
+			495, 4, 1	// shares after 2 ether
+		],
+		[ether, 2 * ether, 0]	// thresholds
+	);
 	deployer.deploy(
 		Token,
 		"CML",

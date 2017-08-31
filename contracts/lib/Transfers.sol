@@ -42,6 +42,11 @@ library Transfers {
 
 	// transfers shares to beneficiaries according to parameters specified
 	function transferValue(Shared storage t, uint value) internal {
+		// quantization
+		if(value == 0) {
+			return;
+		}
+
 		// define auxiliary variables
 		uint n = t.beneficiaries.length; // number of beneficiaries
 		uint[] memory values = new uint[](n); // value to send to each of beneficiaries
