@@ -18,21 +18,18 @@ var Transfer = artifacts.require("./SharedTransfer.sol");
 var Token = artifacts.require("./token/ConfigurableERC20.sol");
 var Crowdsale = artifacts.require("./Crowdsale.sol");
 
+// crowdsale settings
+var length = 21; // crowdsale lasts for 5min (21 blocks)
+var rate = 10 * finney; // token price
+var softCap = 3 * ether;
+var hardCap = 10 * ether;
+var quantum = 0;
+var crowdsaleAmount = hardCap / rate; // crowdsale amount
+var tokenSupply = crowdsaleAmount; // create only corwdsale tokens
+
 module.exports = function(deployer, network) {
-/*
 	deployer.deploy(Transfers);
-	deployer.link(Transfers, Accumulator);
-	// deployer.link(Transfers, Transfer);
-	deployer.deploy(
-		Accumulator,
-		[account1, account2, account3],	// beneficiaries
-		[
-			95, 4, 1,	// shares before 1 ether
-			245, 4, 1,	// shares before 2 ether
-			495, 4, 1	// shares after 2 ether
-		],
-		[ether, 2 * ether, 0]	// thresholds
-	);
+	deployer.link(Transfers, Transfer);
 	deployer.deploy(
 		Transfer,
 		[account1, account2, account3],	// beneficiaries
@@ -43,46 +40,56 @@ module.exports = function(deployer, network) {
 		],
 		[ether, 2 * ether, 0]	// thresholds
 	);
+	deployer.link(Transfers, Accumulator);
 	deployer.deploy(
-		Token,
-		"CML",
-		"CML Token",
-		0,	// tokens are indivisible
-		tokenSupply
+		Accumulator,
+		[account1, account2, account3],	// beneficiaries
+		[
+			95, 4, 1,	// shares before 1 ether
+			245, 4, 1,	// shares before 2 ether
+			495, 4, 1	// shares after 2 ether
+		],
+		[ether, 2 * ether, 0]	// thresholds
 	).then(function() {
-*/
-		var tokenSupply = shannon; // create 10^9 tokens
-		var crowdsaleAmount = ada; // crowdsale only 10^3 tokens
-		var tokenAddress = token0; //Token.address;
+		var accumAddress = Accumulator.address;
 		deployer.deploy(
-			Crowdsale,
-			web3.eth.blockNumber,	// crowdsale start block is next block
-			21,						// crowdsale ends in 5min (21 blocks)
-			10 * finney,	// token price
-			3 * ether,		// soft cap
-			10 * ether,		// hard cap
-			ether,			// quantum
-			accumulator,	// beneficiary
-			tokenAddress,	// token to sell (used for open crowdsale)
-			"CML0",	// token symbol (used for closed crowdsale)
-			"CML Token 0",	// token name (used for closed crowdsale)
-			0 	// token decimals (used for closed crowdsale)
+			Token,
+			"CML",
+			"CML Token",
+			0,	// tokens are indivisible
+			tokenSupply
 		).then(function() {
-			var crowdsaleAddress = Crowdsale.address;
-			Token.at(tokenAddress).transfer(
-				crowdsaleAddress,
-				crowdsaleAmount
-			).then(function(result) {
-				console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully allocated for crowdsale " + crowdsaleAddress);
-				// console.log(result); // too much output
+			var tokenAddress = token0; //Token.address;
+			deployer.deploy(
+				Crowdsale,
+				web3.eth.blockNumber,	// crowdsale start block is next block
+				length,					// crowdsale ends in 5min (21 blocks)
+				rate,			// token price
+				softCap,		// soft cap
+				hardCap,		// hard cap
+				quantum,		// quantum
+				accumAddress,	// beneficiary
+				tokenAddress,	// token to sell (used for open crowdsale)
+				"CML0",	// token symbol (used for closed crowdsale)
+				"CML Token 0",	// token name (used for closed crowdsale)
+				0 	// token decimals (used for closed crowdsale)
+			).then(function() {
+				var crowdsaleAddress = Crowdsale.address;
+				Token.at(tokenAddress).transfer(
+					crowdsaleAddress,
+					crowdsaleAmount
+				).then(function(result) {
+					console.log(crowdsaleAmount + " tokens (" + tokenAddress + ") successfully allocated for crowdsale " + crowdsaleAddress);
+					// console.log(result); // too much output
+				}).catch(function(e) {
+					console.error("ERROR! Unable to allocate " + crowdsaleAmount + " tokens (" + tokenAddress + ") for crowdsale " + crowdsaleAddress);
+					console.error(e);
+				});
 			}).catch(function(e) {
-				console.error("ERROR! Unable to allocate " + crowdsaleAmount + " tokens (" + tokenAddress + ") for crowdsale " + crowdsaleAddress);
+				console.error("ERROR! Crowdsale deployment failed!");
 				console.error(e);
 			});
-		}).catch(function(e) {
-			console.error("ERROR! Crowdsale deployment failed!");
-			console.error(e);
 		});
-//	});
+	});
 };
 

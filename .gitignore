@@ -6,3 +6,8 @@ build/
 *.iml
 *.ipr
 
+
+testrpc.sh
+geth.sh
+key
+pwd

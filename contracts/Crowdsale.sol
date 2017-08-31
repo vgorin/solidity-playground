@@ -217,7 +217,7 @@ contract Crowdsale {
 	}
 
 	// sends all the value to the beneficiary
-	function withdraw() payable {
+	function withdraw() {
 		// perform validations
 		require(creator == msg.sender); // only creator can initiate this call
 		require(collected >= softCap); // crowdsale must be successful
