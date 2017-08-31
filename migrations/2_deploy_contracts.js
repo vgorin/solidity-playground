@@ -17,6 +17,7 @@ var Accumulator = artifacts.require("./SharedAccumulator.sol");
 var Transfer = artifacts.require("./SharedTransfer.sol");
 var Token = artifacts.require("./token/ConfigurableERC20.sol");
 var Crowdsale = artifacts.require("./Crowdsale.sol");
+var Redemption = artifacts.require("./Redemption.sol");
 
 // crowdsale settings
 var length = 21; // crowdsale lasts for 5min (21 blocks)
@@ -89,6 +90,11 @@ module.exports = function(deployer, network) {
 				console.error("ERROR! Crowdsale deployment failed!");
 				console.error(e);
 			});
+			deployer.deploy(
+				Redemption,
+				rate,
+				tokenAddress
+			)
 		});
 	});
 };

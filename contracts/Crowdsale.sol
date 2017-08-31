@@ -61,7 +61,7 @@ contract Crowdsale {
 	uint collected;
 
 	// how much value refunded (if crowdsale failed)
-	uint refunded;
+	//uint refunded;
 
 	// how much tokens issued to investors
 	//uint public tokensIssued;
@@ -208,7 +208,7 @@ contract Crowdsale {
 		investor.transfer(refundValue + msg.value);
 
 		// update crowdsale status
-		refunded += refundValue;
+		//refunded += refundValue;
 		//tokensRedeemed += tokens;
 		//refunds++;
 
