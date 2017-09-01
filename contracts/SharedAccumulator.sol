@@ -21,7 +21,7 @@ contract SharedAccumulator {
 
 	// allocates current balance to beneficiaries
 	function split() {
-		t.approveBalance(this.balance);
+		t.update(this.balance);
 	}
 
 	// performs immediate transfer (to the caller)

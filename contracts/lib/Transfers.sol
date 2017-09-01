@@ -44,20 +44,20 @@ library Transfers {
 	}
 
 	// approves shares transfers to beneficiaries according to parameters specified
-	// similar to approveValue except it takes whole contract balance as an argument
-	function approveBalance(Shared storage t, uint balance) internal {
+	// similar to append except it takes whole contract balance as an argument
+	function update(Shared storage t, uint balance) internal {
 		require(balance > t.balance);
-		approveValue(t, balance - t.balance);
+		append(t, balance - t.balance);
 	}
 
 	// approves shares transfers to beneficiaries according to parameters specified
-	function approveValue(Shared storage t, uint value) internal {
+	function append(Shared storage t, uint value) internal {
 		// validations
 		require(value > 0);
 
 		// define auxiliary variables
 		uint n = t.beneficiaries.length; // number of beneficiaries
-		uint[] memory values = new uint[](n); // value to send to each of beneficiaries
+		uint[] memory values = new uint[](n); // value to allocate for each of beneficiaries
 
 		// process thresholds
 		for(
@@ -74,6 +74,7 @@ library Transfers {
 
 		// update status
 		t.transferred += value;
+		t.balance += value;
 
 		// approve the values transfers
 		for(uint i = 0; i < n; i++) {
@@ -83,6 +84,9 @@ library Transfers {
 
 	// performs actual value transfer to all beneficiaries, should be called after approveValue
 	function withdrawAll(Shared storage t) internal {
+		// ensure balance is positive
+		assert(t.balance > 0);
+		// perform withdrawal
 		for(uint i = 0; i < t.beneficiaries.length; i++) {
 			address beneficiary = t.beneficiaries[i];
 			if(t.balances[beneficiary] > 0) {
@@ -110,7 +114,6 @@ library Transfers {
 	// approves value transfer for beneficiary
 	function __transfer(Shared storage t, address beneficiary, uint value) private {
 		t.balances[beneficiary] += value;
-		t.balance += value;
 	}
 
 	// n - number of beneficiaries, values array length

@@ -10,7 +10,7 @@ contract SharedTransfer is SharedAccumulator {
 
 	// payable fallback, complex
 	function() payable {
-		t.approveValue(msg.value);
+		t.append(msg.value);
 	}
 
 }
