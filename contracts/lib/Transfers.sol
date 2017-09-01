@@ -17,6 +17,7 @@ library Transfers {
 	function create(address[] beneficiaries, uint[] shares, uint[] thresholds) internal returns (Shared) {
 		// basic validation
 		require(beneficiaries.length > 0);
+		require(beneficiaries.length < 32); // protect from 'DoS with Block Gas Limit'
 		require(shares.length > 0);
 		require(shares.length == thresholds.length * beneficiaries.length);
 
@@ -72,6 +73,27 @@ library Transfers {
 			t.beneficiaries[i].transfer(values[i]);
 		}
 	}
+
+/*
+	// performs actual value transfer, should be called after approveValue
+	function transferValue(Shared storage t, address recipient) internal {
+		// recipient's balance must be positive
+		require(t.balances[recipient] > 0);
+
+		// update balance first
+		t.balances[recipient] = 0;
+
+		// transfer the value after
+		recipient.transfer(t.balances[recipient]);
+	}
+
+	// performs actual value transfer to all beneficiaries, should be called after approveValue
+	function transferAll(Shared storage t) internal {
+		for(uint i = 0; i < t.beneficiaries.length; i++) {
+			transferValue(t, t.beneficiaries[i]);
+		}
+	}
+*/
 
 	// n - number of beneficiaries, values array length
 	// values - array to accumulate each beneficiary value share during current transfer

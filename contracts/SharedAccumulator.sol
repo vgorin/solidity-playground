@@ -19,8 +19,8 @@ contract SharedAccumulator {
 		t = Transfers.create(beneficiaries, shares, thresholds);
 	}
 
+	// performs immediate transfer (to the caller)
 	function withdraw() {
-		// perform immediate transfer
 		t.transferValue(this.balance);
 	}
 

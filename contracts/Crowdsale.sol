@@ -219,7 +219,7 @@ contract Crowdsale {
 	// sends all the value to the beneficiary
 	function withdraw() {
 		// perform validations
-		require(creator == msg.sender); // only creator can initiate this call
+		assert(creator == msg.sender); // only creator can initiate this call
 		assert(collected >= softCap); // crowdsale must be successful
 		assert(this.balance > 0); // there should be something to transfer
 

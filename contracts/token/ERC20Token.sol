@@ -31,9 +31,9 @@ contract ERC20Token is ERC20 {
 	*/
 	function transfer(address _to, uint _value) returns (bool) {
 		// check input parameter(s)
-		assert(_value > 0); // non-negative transfer
+		require(_value > 0); // non-zero transfer
 		assert(balances[_to] + _value > balances[_to]); // overflow check
-		require(_value <= balances[msg.sender]); // enough funds
+		require(_value <= balances[msg.sender]); // enough funds available
 
 		// perform the operation
 		balances[msg.sender] -= _value;
@@ -60,7 +60,7 @@ contract ERC20Token is ERC20 {
 	// deliberately authorized the sender of the message via some mechanism
 	function transferFrom(address _from, address _to, uint _value) returns (bool) {
 		// check input parameter(s)
-		assert(_value > 0); // non-negative transfer
+		require(_value > 0); // non-zero transfer
 		assert(balances[_to] + _value > balances[_to]); // overflow check
 		require(_value <= balances[_from]); // enough funds available on account
 		require(_value <= allowed[_from][msg.sender]); // enough funds allowed to transfer
