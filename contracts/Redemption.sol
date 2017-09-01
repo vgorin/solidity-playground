@@ -2,6 +2,8 @@ pragma solidity ^0.4.11;
 
 import './token/ERC20.sol';
 
+// Token redemption is opposite to crowdsale.
+// It allows redeeming tokens back from investors
 contract Redemption {
 	// contract creator, owner of the contract
 	// creator is also supplier of ether to redeem tokens
