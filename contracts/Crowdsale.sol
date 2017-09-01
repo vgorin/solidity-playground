@@ -139,9 +139,9 @@ contract Crowdsale {
 	// crowdsale to be running and not reached its goal
 	function invest() payable {
 		// perform validations
-		require(block.number >= offset); // crowdsale started
-		require(block.number < offset + length); // crowdsale has not ended
-		require(collected + rate <= hardCap || hardCap == 0); // its still possible to buy at least 1 token
+		assert(block.number >= offset); // crowdsale started
+		assert(block.number < offset + length); // crowdsale has not ended
+		assert(collected + rate <= hardCap || hardCap == 0); // its still possible to buy at least 1 token
 		require(msg.value >= rate); // value sent is enough to buy at least one token
 
 		// call 'sender' nicely - investor
@@ -185,8 +185,8 @@ contract Crowdsale {
 	// requires investor to allow token transfer back
 	function refund() payable {
 		// perform validations
-		require(block.number >= offset + length); // crowdsale ended
-		require(collected < softCap); // crowdsale failed
+		assert(block.number >= offset + length); // crowdsale ended
+		assert(collected < softCap); // crowdsale failed
 
 		// call 'sender' nicely - investor
 		address investor = msg.sender;
@@ -199,7 +199,7 @@ contract Crowdsale {
 
 		// additional validations
 		require(tokens > 0);
-		require(refundValue <= this.balance);
+		assert(refundValue <= this.balance);
 
 		// update crowdsale status
 		//refunded += refundValue;
@@ -220,8 +220,8 @@ contract Crowdsale {
 	function withdraw() {
 		// perform validations
 		require(creator == msg.sender); // only creator can initiate this call
-		require(collected >= softCap); // crowdsale must be successful
-		require(this.balance > 0); // there should be something to transfer
+		assert(collected >= softCap); // crowdsale must be successful
+		assert(this.balance > 0); // there should be something to transfer
 
 		// how much to withdraw (entire balance obviously)
 		uint value = this.balance;
