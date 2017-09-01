@@ -29,6 +29,11 @@ contract SharedAccumulator {
 		t.withdraw(msg.sender);
 	}
 
+	// performs immediate transfer (for everyone)
+	function withdrawAll() {
+		t.withdrawAll();
+	}
+
 	// payable fallback, can be executed on stipend
 	function() payable {
 		// accumulate, must be executed on stipend - 2300 gas
