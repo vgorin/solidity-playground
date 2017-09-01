@@ -45,7 +45,6 @@ var crowdsale = {
 var supply = preSale.amount + crowdsale.amount;
 
 module.exports = function(deployer, network) {
-/*
 	deployer.deploy(Transfers);
 	deployer.link(Transfers, Transfer);
 	deployer.deploy(
@@ -69,9 +68,7 @@ module.exports = function(deployer, network) {
 		],
 		[ether, 2 * ether, 0]	// thresholds
 	);
-*/
 
-/*
 	deployer.deploy(
 		Token,
 		"TK",
@@ -79,10 +76,9 @@ module.exports = function(deployer, network) {
 		0, // tokens are indivisible
 		supply
 	);
-*/
 
-	// deployCrowdsale(deployer, preSale);
-	// deployCrowdsale(deployer, crowdsale);
+	deployCrowdsale(deployer, preSale);
+	deployCrowdsale(deployer, crowdsale);
 
 	deployer.deploy(
 		Redemption,
