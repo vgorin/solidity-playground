@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.15;
 
 import './ERC20Token.sol';
 
@@ -16,7 +16,7 @@ contract FixedERC20 is ERC20Token {
 	}
 
 	// total supply is constant
-	function totalSupply() constant returns (uint totalSupply) {
+	function totalSupply() constant returns (uint _totalSupply) {
 		return __totalSupply;
 	}
 }

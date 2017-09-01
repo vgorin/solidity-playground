@@ -1,8 +1,8 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.15;
 
 // ERC: Token standard #20, https://github.com/ethereum/eips/issues/20
 contract ERC20 {
-	function totalSupply() constant returns (uint totalSupply);
+	function totalSupply() constant returns (uint _totalSupply);
 	function balanceOf(address _owner) constant returns (uint balance);
 	function transfer(address _to, uint _value) returns (bool success);
 	function transferFrom(address _from, address _to, uint _value) returns (bool success);
