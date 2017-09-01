@@ -64,13 +64,13 @@ library Transfers {
 		// all the thresholds are crossed, calculate the rest
 		__split(values, t.shares, t.idx, value - current + t.transferred);
 
+		// update status
+		t.transferred += value;
+
 		// send the values
 		for(uint i = 0; i < n; i++) {
 			t.beneficiaries[i].transfer(values[i]);
 		}
-
-		// update status
-		t.transferred += value;
 	}
 
 	// n - number of beneficiaries, values array length

@@ -160,6 +160,11 @@ contract Crowdsale {
 			value = tokens * rate;
 		}
 
+		// update crowdsale status
+		collected += value;
+		//tokensIssued += tokens;
+		//transactions++;
+
 		// transfer tokens to investor
 		__issueTokens(investor, tokens);
 
@@ -171,11 +176,6 @@ contract Crowdsale {
 			// transfer all the value to beneficiary
 			__beneficiaryTransfer(this.balance);
 		}
-
-		// update crowdsale status
-		collected += value;
-		//tokensIssued += tokens;
-		//transactions++;
 
 		// log an event
 //		InvestmentAccepted(investor, tokens, value);
@@ -201,16 +201,16 @@ contract Crowdsale {
 		require(tokens > 0);
 		require(refundValue <= this.balance);
 
+		// update crowdsale status
+		//refunded += refundValue;
+		//tokensRedeemed += tokens;
+		//refunds++;
+
 		// transfer the tokens back
 		__redeemTokens(investor, tokens);
 
 		// make a refund
 		investor.transfer(refundValue + msg.value);
-
-		// update crowdsale status
-		//refunded += refundValue;
-		//tokensRedeemed += tokens;
-		//refunds++;
 
 		// log an event
 //		RefundIssued(investor, tokens, refundValue);
