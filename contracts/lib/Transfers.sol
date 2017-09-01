@@ -62,7 +62,7 @@ library Transfers {
 		// process thresholds
 		for(
 			uint current = t.transferred; // current active threshold
-			t.thresholds[t.idx] != 0 && t.transferred + value > t.thresholds[i];
+			t.thresholds[t.idx] != 0 && t.transferred + value > t.thresholds[t.idx];
 			current = t.thresholds[t.idx++] // update both current threshold and idx
 		) {
 			// calculate each beneficiary value share in between thresholds
