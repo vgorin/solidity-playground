@@ -9,6 +9,8 @@ library Transfers {
 		address[] beneficiaries; // config
 		uint[] shares; // config
 		uint[] thresholds; // config
+		mapping(address => uint) balances;  // current status
+		uint balance; // current status, sum of all balances
 		uint transferred; // current status
 		uint idx; // current threshold index
 	}
@@ -38,15 +40,20 @@ library Transfers {
 		require(thresholds[thresholds.length - 1] == 0);
 
 		// create shared transfer struct
-		return Shared(beneficiaries, shares, thresholds, 0, 0);
+		return Shared(beneficiaries, shares, thresholds, 0, 0, 0);
 	}
 
-	// transfers shares to beneficiaries according to parameters specified
-	function transferValue(Shared storage t, uint value) internal {
-		// quantization
-		if(value == 0) {
-			return;
-		}
+	// approves shares transfers to beneficiaries according to parameters specified
+	// similar to approveValue except it takes whole contract balance as an argument
+	function approveBalance(Shared storage t, uint balance) internal {
+		require(balance > t.balance);
+		approveValue(t, balance - t.balance);
+	}
+
+	// approves shares transfers to beneficiaries according to parameters specified
+	function approveValue(Shared storage t, uint value) internal {
+		// validations
+		require(value > 0);
 
 		// define auxiliary variables
 		uint n = t.beneficiaries.length; // number of beneficiaries
@@ -68,37 +75,48 @@ library Transfers {
 		// update status
 		t.transferred += value;
 
-		// send the values
+		// approve the values transfers
 		for(uint i = 0; i < n; i++) {
-			t.beneficiaries[i].transfer(values[i]);
+			__transfer(t, t.beneficiaries[i], values[i]);
 		}
-	}
-
-/*
-	// performs actual value transfer, should be called after approveValue
-	function transferValue(Shared storage t, address recipient) internal {
-		// recipient's balance must be positive
-		require(t.balances[recipient] > 0);
-
-		// update balance first
-		t.balances[recipient] = 0;
-
-		// transfer the value after
-		recipient.transfer(t.balances[recipient]);
 	}
 
 	// performs actual value transfer to all beneficiaries, should be called after approveValue
-	function transferAll(Shared storage t) internal {
+	function withdrawAll(Shared storage t) internal {
 		for(uint i = 0; i < t.beneficiaries.length; i++) {
-			transferValue(t, t.beneficiaries[i]);
+			address beneficiary = t.beneficiaries[i];
+			if(t.balances[beneficiary] > 0) {
+				withdraw(t, beneficiary);
+			}
 		}
 	}
-*/
+
+	// performs actual value transfer to all beneficiaries, should be called after approveValue
+	function withdraw(Shared storage t, address beneficiary) internal {
+		uint value = t.balances[beneficiary];
+
+		// validations
+		require(value > 0); // input
+		assert(t.balance >= value); // state
+
+		// update contract state
+		t.balances[beneficiary] = 0;
+		t.balance -= value;
+
+		// do the transfer
+		beneficiary.transfer(value);
+	}
+
+	// approves value transfer for beneficiary
+	function __transfer(Shared storage t, address beneficiary, uint value) private {
+		t.balances[beneficiary] += value;
+		t.balance += value;
+	}
 
 	// n - number of beneficiaries, values array length
 	// values - array to accumulate each beneficiary value share during current transfer
 	// value - total value during current round of transfer
-	function __split(uint[] memory values, uint[] shares, uint idx, uint value) internal {
+	function __split(uint[] memory values, uint[] shares, uint idx, uint value) private {
 		// number of beneficiaries
 		uint n = values.length;
 

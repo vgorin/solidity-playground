@@ -19,9 +19,14 @@ contract SharedAccumulator {
 		t = Transfers.create(beneficiaries, shares, thresholds);
 	}
 
+	// allocates current balance to beneficiaries
+	function split() {
+		t.approveBalance(this.balance);
+	}
+
 	// performs immediate transfer (to the caller)
 	function withdraw() {
-		t.transferValue(this.balance);
+		t.withdraw(msg.sender);
 	}
 
 	// payable fallback, can be executed on stipend
