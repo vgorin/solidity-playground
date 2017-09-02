@@ -10,42 +10,44 @@ var account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
 var account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
 var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
-var accumulator = '0x650c2d51dd04a70f1223ca83eefeccc8dec72519';
+var acc0 = '0x20bf25e46a40fb64fde7aa8fc3170549a7feab37';
 
-var token0 = '0xdbe4d5fd70493c159b5c15c1d9c7bf3afce838e1';
-
-var Transfers = artifacts.require("./lib/Transfers.sol");
-var Accumulator = artifacts.require("./SharedAccumulator.sol");
-var Transfer = artifacts.require("./SharedTransfer.sol");
-var Token = artifacts.require("./token/ConfigurableERC20.sol");
-var Crowdsale = artifacts.require("./Crowdsale.sol");
-var Redemption = artifacts.require("./Redemption.sol");
+var token0 = '0x8c10b0d326c394820eaee137a4936328d4d5dc0c';
 
 // crowdsale settings
-var preSale = {
-	length: 21, // crowdsale lasts for 5min (21 blocks)
-	rate: 5 * finney, // token price
-	softCap: 0,
-	hardCap: ether,
-	quantum: 0,
-	amount: 200
-};
+var preSale = new Crowdsale(
+	web3.eth.blockNumber, // offset
+	21, // length
+	5 * finney, // rate
+	0, // softCap
+	ether, // hardCap
+	0 // quantum
+);
 
 // crowdsale settings
-var crowdsale = {
-	length: 21, // crowdsale lasts for 5min (21 blocks)
-	rate: 10 * finney, // token price
-	softCap: ether,
-	hardCap: 10 * ether,
-	quantum: 0,
-	amount: 1000
-};
+var crowdsale = new Crowdsale(
+	web3.eth.blockNumber, // offset
+	21, // length
+	10 * finney, // rate
+	ether, // softCap
+	10 * ether, // hardCap
+	0 // quantum
+);
 
 // total token supply
-var supply = preSale.amount + crowdsale.amount;
+var supply = 100 * (preSale.amount() + crowdsale.amount());
 
 module.exports = function(deployer, network) {
+	var Transfers = artifacts.require("./lib/Transfers.sol");
+	var Accumulator = artifacts.require("./SharedAccumulator.sol");
+	var Transfer = artifacts.require("./SharedTransfer.sol");
+	var Token = artifacts.require("./token/ConfigurableERC20.sol");
+	var Crowdsale = artifacts.require("./Crowdsale.sol");
+	var Redemption = artifacts.require("./Redemption.sol");
+
+
 	deployer.deploy(Transfers);
+
 	deployer.link(Transfers, Transfer);
 	deployer.deploy(
 		Transfer,
@@ -57,6 +59,7 @@ module.exports = function(deployer, network) {
 		],
 		[ether, 2 * ether, 0]	// thresholds
 	);
+
 	deployer.link(Transfers, Accumulator);
 	deployer.deploy(
 		Accumulator,
@@ -77,44 +80,58 @@ module.exports = function(deployer, network) {
 		supply
 	);
 
-	deployCrowdsale(deployer, preSale);
-	deployCrowdsale(deployer, crowdsale);
+	deployCrowdsale(deployer, Crowdsale, Token, preSale);
+	deployCrowdsale(deployer, Crowdsale, Token, crowdsale);
 
 	deployer.deploy(
 		Redemption,
 		20 * finney,
 		token0
 	);
+
 };
 
-function deployCrowdsale(deployer, crowdsale) {
+function deployCrowdsale(deployer, crowdsaleContract, tokenContract, crowdsale) {
 	deployer.deploy(
-		Crowdsale,
-		web3.eth.blockNumber,	// crowdsale start block is next block
-		crowdsale.length,					// crowdsale ends in 5min (21 blocks)
-		crowdsale.rate,			// token price
-		crowdsale.softCap,		// soft cap
-		crowdsale.hardCap,		// hard cap
-		crowdsale.quantum,		// quantum
-		account1,		// beneficiary
-		token0,	// token to sell (used for open crowdsale)
-		"",	// token symbol (used for closed crowdsale)
-		"",	// token name (used for closed crowdsale)
-		0 	// token decimals (used for closed crowdsale)
+		crowdsaleContract,
+		crowdsale.offset,
+		crowdsale.length,
+		crowdsale.rate,
+		crowdsale.softCap,
+		crowdsale.hardCap,
+		crowdsale.quantum,
+		acc0, // beneficiary
+		token0, // token to sell (used for open crowdsale)
+		"", // token symbol (used for closed crowdsale)
+		"", // token name (used for closed crowdsale)
+		0  // token decimals (used for closed crowdsale)
 	).then(function() {
-		var crowdsaleAddress = Crowdsale.address;
-		Token.at(token0).transfer(
+		var crowdsaleAddress = crowdsaleContract.address;
+		tokenContract.at(token0).transfer(
 			crowdsaleAddress,
-			crowdsale.amount
+			crowdsale.amount()
 		).then(function(result) {
-			console.log(crowdsale.amount + " tokens (" + token0 + ") successfully allocated for crowdsale " + crowdsaleAddress);
+			console.log(crowdsale.amount() + " tokens (" + token0 + ") successfully allocated for crowdsale " + crowdsaleAddress);
 			// console.log(result); // too much output
 		}).catch(function(e) {
-			console.error("ERROR! Unable to allocate " + crowdsale.amount + " tokens (" + token0 + ") for crowdsale " + crowdsaleAddress);
+			console.error("ERROR! Unable to allocate " + crowdsale.amount() + " tokens (" + token0 + ") for crowdsale " + crowdsaleAddress);
 			console.error(e);
 		});
 	}).catch(function(e) {
 		console.error("ERROR! Crowdsale deployment failed!");
 		console.error(e);
 	});
+}
+
+function Crowdsale(offset, length, rate, softCap, hardCap, quantum) {
+	this.offset = offset;
+	this.length = length;
+	this.rate = rate;
+	this.softCap = softCap;
+	this.hardCap = hardCap;
+	this.quantum = quantum;
+
+	this.amount = function() {
+		return this.hardCap / this.rate;
+	}
 }
