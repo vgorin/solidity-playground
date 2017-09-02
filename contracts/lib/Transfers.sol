@@ -6,38 +6,49 @@ import '../token/ERC20.sol';
 library Transfers {
 	// base structure for storing config and current state
 	struct Shared {
-		address[] beneficiaries; // config
-		uint[] shares; // config
-		uint[] thresholds; // config
-		mapping(address => uint) balances;  // current status
-		uint balance; // current status, sum of all balances
-		uint transferred; // current status
-		uint idx; // current threshold index
+		address[] beneficiaries; // config, constant
+		uint[] shares; // config, constant
+		uint[] thresholds; // config, constant
+		mapping(address => uint) balances;  // status
+		uint balance; // status: sum of all balances
+		uint transferred; // status: current threshold value
+		uint idx; // status: current threshold index
 	}
 
 	// used to validate config parameters used in sharedTransfer
 	function create(address[] beneficiaries, uint[] shares, uint[] thresholds) internal returns (Shared) {
-		// basic validation
-		require(beneficiaries.length > 0);
-		require(beneficiaries.length < 32); // protect from 'DoS with Block Gas Limit'
-		require(shares.length > 0);
-		require(shares.length == thresholds.length * beneficiaries.length);
+		// total number of beneficiaries, used a lot in the code, shorten it
+		uint n = beneficiaries.length;
 
-		// iterate the loops
-		uint i;
+		// basic validation
+		require(n > 0);
+		require(n < 32); // protect from 'DoS with Block Gas Limit'
+		require(shares.length > 0);
+		require(shares.length == thresholds.length * n);
 
 		// in-depth validation of beneficiaries
-		for(i = 0; i < beneficiaries.length; i++) {
+		for(uint i = 0; i < n; i++) {
 			require(beneficiaries[i] != address(0));
 		}
 
-		// in-depth validation of thresholds
-		uint t = 0;
-		for(i = 0; i < thresholds.length - 1; i++) {
-			require(t < thresholds[i]);
-			t = thresholds[i];
+		// yes, this stupid language allows to use i though it was defined in 'for loop' scope
+		i = 0; // just need to reset it, cause it contains beneficiaries.length - 1 now
+		// perform in-depth validation of thresholds
+		for(uint t = 0; i < thresholds.length - 1; t = thresholds[i++]) {
+			require(t < thresholds[i]); // array must be monotonously growing
 		}
-		require(thresholds[thresholds.length - 1] == 0);
+		require(thresholds[i] == 0); // except the last element which must be zero
+
+		// in-depth check of shares array
+		for(i = 0; i < shares.length; i++) {
+		  // shares shouldn't contain big numbers - will affect precision heavily
+			require(shares[i] < 2 << 15);
+
+			// make sure shares array doesn't contain zero sums -  future division zero by zero
+			if(i / n * n == i) { // division reminder - 'nice', isn't it?
+				require(__totalShare(shares, i / n, n) > 0);
+			}
+		}
 
 		// create shared transfer struct
 		return Shared(beneficiaries, shares, thresholds, 0, 0, 0);
@@ -53,13 +64,15 @@ library Transfers {
 	// approves shares transfers to beneficiaries according to parameters specified
 	function append(Shared storage t, uint value) internal {
 		// validations
-		require(value > 0);
+		require(value > 0); // input parameter check
+		assert(t.transferred + value > t.transferred); // overflow check
+		assert(t.balance + value > t.balance); // overflow check
 
 		// define auxiliary variables
 		uint n = t.beneficiaries.length; // number of beneficiaries
 		uint[] memory values = new uint[](n); // value to allocate for each of beneficiaries
 
-		// process thresholds
+		// cross the thresholds
 		for(
 			uint current = t.transferred; // current active threshold
 			t.thresholds[t.idx] != 0 && t.transferred + value > t.thresholds[t.idx];
@@ -100,8 +113,8 @@ library Transfers {
 		uint value = t.balances[beneficiary];
 
 		// validations
-		require(value > 0); // input
-		assert(t.balance >= value); // state
+		require(value > 0); // input parameter check
+		assert(t.balance >= value); // structure state check + overflow check
 
 		// update contract state
 		t.balances[beneficiary] = 0;
@@ -113,7 +126,8 @@ library Transfers {
 
 	// approves value transfer for beneficiary
 	function __transfer(Shared storage t, address beneficiary, uint value) private {
-		t.balances[beneficiary] += value;
+		assert(t.balances[beneficiary] + value > t.balances[beneficiary]); // overflow check
+		t.balances[beneficiary] += value; // perform operation
 	}
 
 	// n - number of beneficiaries, values array length
@@ -131,12 +145,7 @@ library Transfers {
 		uint vi;
 
 		// total share
-		uint share = 0;
-
-		// calculate total share for current round
-		for(i = 0; i < n; i++) {
-			share += shares[idx * n + i];
-		}
+		uint share = __totalShare(shares, idx, n);
 
 		// calculate each beneficiary value share
 		for(i = 0; i < n; i++) {
@@ -147,6 +156,14 @@ library Transfers {
 
 		// fix rounding off discrepancy
 		values[0] += value - v0;
+	}
+
+	// calculates the sum of shares in range [idx * n, (idx + 1) * n)
+	function __totalShare(uint[] shares, uint idx, uint n) private returns(uint share) {
+		// calculate total share for round 'idx'
+		for(uint i = 0; i < n; i++) {
+			share += shares[idx * n + i];
+		}
 	}
 
 }
