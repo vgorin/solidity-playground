@@ -25,13 +25,14 @@ import './token/ConfigurableERC20.sol';
  * Token redemption is done in opposite way: tokens accumulate back on contract's address
  * Beneficiary is specified by its address.
  * Use this implementation if you need to make several crowdsales with the same token being sold.
+ * Open crowdsale is defined in OpenCrowdsale contract.
  *
  * Closed crowdsale owns all the tokens, it guarantees no token emission will occur outside the crowdsale.
  * The tokens created by a crowdsale are used for issuing them to investors.
  * Token redemption is done in opposite way: tokens accumulate back on crowdsale's address
  * Beneficiary is specified by its address.
- *
  * Use this implementation if you won't have several crowdsales with the same token being sold.
+ * Closed crowdsale is defined in ClosedCrowdsale contract.
  *
  */
 contract Crowdsale {
