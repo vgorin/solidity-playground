@@ -75,7 +75,9 @@ module.exports = function(deployer, network) {
 			495, 4, 1	// shares after 2 ether
 		],
 		[5 * ether, 10 * ether, 0]	// thresholds
-	);
+	).then(function() {
+		acc0 = Accumulator.address;
+	});
 
 	deployer.deploy(
 		Token,
@@ -83,7 +85,9 @@ module.exports = function(deployer, network) {
 		"Agrara Token",
 		0, // tokens are indivisible
 		supply
-	);
+	).then(function() {
+		token0 = Token.address;
+	});
 
 	deployCrowdsale(deployer, Crowdsale, Token, preSale);
 	deployCrowdsale(deployer, Crowdsale, Token, crowdsale);
