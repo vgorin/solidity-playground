@@ -14,28 +14,31 @@ var acc0 = '0x20bf25e46a40fb64fde7aa8fc3170549a7feab37';
 
 var token0 = '0x8c10b0d326c394820eaee137a4936328d4d5dc0c';
 
+var offset = web3.eth.blockNumber;
+console.log("offset: " + offset);
+
 // crowdsale settings
 var preSale = new Crowdsale(
-	web3.eth.blockNumber, // offset
-	21, // length
+	offset, // offset
+	43200, // length
 	5 * finney, // rate
 	0, // softCap
-	ether, // hardCap
+	10 * ether, // hardCap
 	0 // quantum
 );
 
 // crowdsale settings
 var crowdsale = new Crowdsale(
-	web3.eth.blockNumber, // offset
-	21, // length
+	offset, // offset
+	43200, // length
 	10 * finney, // rate
-	ether, // softCap
-	10 * ether, // hardCap
+	10 * ether, // softCap
+	20 * ether, // hardCap
 	0 // quantum
 );
 
 // total token supply
-var supply = 100 * (preSale.amount() + crowdsale.amount());
+var supply = preSale.amount() + crowdsale.amount();
 
 module.exports = function(deployer, network) {
 	var Transfers = artifacts.require("./lib/Transfers.sol");
@@ -48,6 +51,7 @@ module.exports = function(deployer, network) {
 
 	deployer.deploy(Transfers);
 
+/*
 	deployer.link(Transfers, Transfer);
 	deployer.deploy(
 		Transfer,
@@ -59,6 +63,7 @@ module.exports = function(deployer, network) {
 		],
 		[ether, 2 * ether, 0]	// thresholds
 	);
+*/
 
 	deployer.link(Transfers, Accumulator);
 	deployer.deploy(
@@ -69,13 +74,13 @@ module.exports = function(deployer, network) {
 			245, 4, 1,	// shares before 2 ether
 			495, 4, 1	// shares after 2 ether
 		],
-		[ether, 2 * ether, 0]	// thresholds
+		[5 * ether, 10 * ether, 0]	// thresholds
 	);
 
 	deployer.deploy(
 		Token,
-		"TK",
-		"Token",
+		"AGRA",
+		"Agrara Token",
 		0, // tokens are indivisible
 		supply
 	);
