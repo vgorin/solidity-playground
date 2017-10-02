@@ -1,10 +1,27 @@
-var ada = web3.toWei(1, "kwei");		// 1000
-var babbage = web3.toWei(1, "mwei");	// 10^6
-var shannon = web3.toWei(1, "gwei");	// 10^9
-var szabo = web3.toWei(1, "szabo");		// 10^12
-var finney = web3.toWei(1, "finney");	// 10^15
-var ether = web3.toWei(1, "ether");		// 10^18
-var einstein = web3.toWei(1, "grand");	// 10^21
+Number.prototype.kwei = function () {
+	return web3.toWei(this, "kwei");	// 1000
+};
+
+Number.prototype.mwei = function () {
+	return web3.toWei(this, "mwei");	// 10^6
+};
+Number.prototype.gwei = function () {
+	return web3.toWei(this, "gwei");	// 10^9
+};
+
+Number.prototype.szabo = function () {
+	return web3.toWei(this, "szabo");	// 10^12
+};
+Number.prototype.finney = function () {
+	return web3.toWei(this, "finney");	// 10^15
+};
+
+Number.prototype.ether = function () {
+	return web3.toWei(this, "ether");	// 10^18
+};
+Number.prototype.einstein = function () {
+	return web3.toWei(this, "grand");	// 10^21
+};
 
 var account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
 var account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
@@ -18,9 +35,9 @@ var token0 = '0x462d2bf198865371d3043259d175770b3dc4284a';
 var pre_sale = new CrowdsaleConfig(
 	1512086400, // 12/01/2017 @ 12:00am (UTC)
 	86400, // 1 day
-	5 * finney, // rate
+	5..finney(), // rate
 	0, // softCap
-	10 * ether, // hardCap
+	10..einstein(), // hardCap
 	0 // quantum
 );
 
@@ -28,14 +45,14 @@ var pre_sale = new CrowdsaleConfig(
 var crowdsale = new CrowdsaleConfig(
 	1512432000, // 12/05/2017 @ 12:00am (UTC)
 	1209600, // 14 days
-	10 * finney, // rate
-	10 * ether, // softCap
-	20 * ether, // hardCap
+	10..finney(), // rate
+	10..einstein(), // softCap
+	90..einstein(), // hardCap
 	0 // quantum
 );
 
 // total token supply
-var supply = pre_sale.amount() + crowdsale.amount();
+var supply = 2 * (pre_sale.amount() + crowdsale.amount());
 
 module.exports = function(deployer, network) {
 	var Transfers = artifacts.require("./lib/Transfers.sol");
@@ -57,7 +74,7 @@ module.exports = function(deployer, network) {
 			245, 4, 1,	// shares before 2 ether
 			495, 4, 1	// shares after 2 ether
 		],
-		[5 * ether, 10 * ether, 0]	// thresholds
+		[7..einstein(), 35..einstein(), 0]	// thresholds
 	).then(function() {
 		acc0 = Accumulator.address;
 	});
@@ -66,7 +83,7 @@ module.exports = function(deployer, network) {
 		Token,
 		"BSL",
 		"Basil Token",
-		0, // tokens are indivisible
+		18,
 		supply
 	).then(function() {
 		token0 = Token.address;
@@ -77,7 +94,7 @@ module.exports = function(deployer, network) {
 
 	deployer.deploy(
 		Redemption,
-		20 * finney,
+		20..finney,
 		token0
 	);
 
