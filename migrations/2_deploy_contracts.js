@@ -1,21 +1,18 @@
 Number.prototype.kwei = function () {
 	return web3.toWei(this, "kwei");	// 1000
 };
-
 Number.prototype.mwei = function () {
 	return web3.toWei(this, "mwei");	// 10^6
 };
 Number.prototype.gwei = function () {
 	return web3.toWei(this, "gwei");	// 10^9
 };
-
 Number.prototype.szabo = function () {
 	return web3.toWei(this, "szabo");	// 10^12
 };
 Number.prototype.finney = function () {
 	return web3.toWei(this, "finney");	// 10^15
 };
-
 Number.prototype.ether = function () {
 	return web3.toWei(this, "ether");	// 10^18
 };
@@ -23,40 +20,51 @@ Number.prototype.einstein = function () {
 	return web3.toWei(this, "grand");	// 10^21
 };
 
-Number.prototype.k = function () {
-	return this;// / 10..kwei();
-};
-
 var account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
 var account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
 var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
-var acc0 = '0x04b9bf8144bf7c26063645372b2d4f8bf630ad84';
+var acc0 = '0x13e5e5c56424050d30ae42895d744d3e5f0cb131';
 
-var token0 = '0x462d2bf198865371d3043259d175770b3dc4284a';
+var token0 = '0xa6e57c9a29797efdd505dd76916a7b337a2245d8';
+
+var decimals = 18;
+var pow = Math.pow(10, decimals);
+
+// ether coefficient
+var k = 10..kwei();
+
+// current unix timestamp as described in www.unixtimestamp.com
+var now = new Date().getTime() / 1000 | 0;
 
 // crowdsale settings
 var pre_sale = new CrowdsaleConfig(
-	1512086400, // 12/01/2017 @ 12:00am (UTC)
-	86400, // 1 day
+	now, // 1512086400, // 12/01/2017 @ 12:00am (UTC)
+	300, // 86400, // 1 day
 	5..finney(), // rate
 	0, // softCap
-	10..einstein().k(), // hardCap
+	10..einstein() / k, // hardCap
 	0 // quantum
 );
 
 // crowdsale settings
 var crowdsale = new CrowdsaleConfig(
-	1512432000, // 12/05/2017 @ 12:00am (UTC)
-	1209600, // 14 days
+	now + 300, // 1512432000, // 12/05/2017 @ 12:00am (UTC)
+	300, // 1209600, // 14 days
 	10..finney(), // rate
-	10..einstein().k(), // softCap
-	90..einstein().k(), // hardCap
+	10..einstein() / k, // softCap
+	90..einstein() / k, // hardCap
 	0 // quantum
 );
 
 // total token supply
 var supply = 2 * (pre_sale.amount() + crowdsale.amount());
+console.log("total token supply:\t" + supply);
+console.log("pre-sale price:\t" + pre_sale.price);
+console.log("pre-sale hard cap:\t" + pre_sale.hardCap);
+console.log("crowdsale price:\t" + crowdsale.price);
+console.log("crowdsale soft cap:\t" + crowdsale.softCap);
+console.log("crowdsale hard cap:\t" + crowdsale.hardCap);
 
 module.exports = function(deployer, network) {
 	var Transfers = artifacts.require("./lib/Transfers.sol");
@@ -79,8 +87,8 @@ module.exports = function(deployer, network) {
 			495, 4, 1	// shares after t1
 		],
 		[
-			7..einstein().k(),	// t0
-			35..einstein().k(),	// t1
+			7..einstein() / k,	// t0
+			35..einstein() / k,	// t1
 			0
 		]
 	).then(function() {
@@ -92,7 +100,7 @@ module.exports = function(deployer, network) {
 		"BSL",
 		"Basil Token",
 		18,
-		supply
+		supply * pow
 	).then(function() {
 		token0 = Token.address;
 	});
@@ -102,7 +110,7 @@ module.exports = function(deployer, network) {
 
 	deployer.deploy(
 		Redemption,
-		20..finney,
+		20..finney(),
 		token0
 	);
 
@@ -113,7 +121,7 @@ function deployCrowdsale(deployer, contract, token, config) {
 		contract,
 		config.offset,
 		config.length,
-		config.rate,
+		config.price,
 		config.softCap,
 		config.hardCap,
 		config.quantum,
@@ -123,7 +131,7 @@ function deployCrowdsale(deployer, contract, token, config) {
 		var addr = contract.address;
 		token.transfer(
 			addr,
-			config.amount()
+			config.amount() * pow
 		).then(function(result) {
 			console.log(config.amount() + " tokens (" + token.address + ") successfully allocated for crowdsale " + addr);
 			// console.log(result); // too much output
@@ -137,15 +145,15 @@ function deployCrowdsale(deployer, contract, token, config) {
 	});
 }
 
-function CrowdsaleConfig(offset, length, rate, softCap, hardCap, quantum) {
+function CrowdsaleConfig(offset, length, price, softCap, hardCap, quantum) {
 	this.offset = offset;
 	this.length = length;
-	this.rate = rate;
+	this.price = price;
 	this.softCap = softCap;
 	this.hardCap = hardCap;
 	this.quantum = quantum;
 
 	this.amount = function() {
-		return this.hardCap / this.rate;
+		return this.hardCap / this.price;
 	}
 }
