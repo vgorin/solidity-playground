@@ -23,6 +23,10 @@ Number.prototype.einstein = function () {
 	return web3.toWei(this, "grand");	// 10^21
 };
 
+Number.prototype.k = function () {
+	return this;// / 10..kwei();
+};
+
 var account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
 var account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
 var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
@@ -37,7 +41,7 @@ var pre_sale = new CrowdsaleConfig(
 	86400, // 1 day
 	5..finney(), // rate
 	0, // softCap
-	10..einstein(), // hardCap
+	10..einstein().k(), // hardCap
 	0 // quantum
 );
 
@@ -46,8 +50,8 @@ var crowdsale = new CrowdsaleConfig(
 	1512432000, // 12/05/2017 @ 12:00am (UTC)
 	1209600, // 14 days
 	10..finney(), // rate
-	10..einstein(), // softCap
-	90..einstein(), // hardCap
+	10..einstein().k(), // softCap
+	90..einstein().k(), // hardCap
 	0 // quantum
 );
 
@@ -70,11 +74,15 @@ module.exports = function(deployer, network) {
 		Accumulator,
 		[account1, account2, account3],	// beneficiaries
 		[
-			95, 4, 1,	// shares before 1 ether
-			245, 4, 1,	// shares before 2 ether
-			495, 4, 1	// shares after 2 ether
+			95, 4, 1,	// shares before t0
+			245, 4, 1,	// shares before t1
+			495, 4, 1	// shares after t1
 		],
-		[7..einstein(), 35..einstein(), 0]	// thresholds
+		[
+			7..einstein().k(),	// t0
+			35..einstein().k(),	// t1
+			0
+		]
 	).then(function() {
 		acc0 = Accumulator.address;
 	});
