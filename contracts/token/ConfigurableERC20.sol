@@ -1,19 +1,16 @@
 pragma solidity 0.4.15;
 
+import './ExtendedERC20.sol';
 import './FixedERC20.sol';
 
 // ConfigurableERC20 is a basic token implementation,
 // allows defining token symbol, name, decimals -
 // this is enough to display in Ethereum Wallet (like Metamask) nicely
-contract ConfigurableERC20 is FixedERC20 {
-	string public symbol;
-	string public name;
-	uint public decimals;
-
+contract ConfigurableERC20 is ExtendedERC20, FixedERC20 {
 	function ConfigurableERC20(
 		string _symbol,
 		string _name,
-		uint _decimals,
+		uint8 _decimals,
 		uint _totalSupply
 	) FixedERC20(_totalSupply) {
 		// perform validations

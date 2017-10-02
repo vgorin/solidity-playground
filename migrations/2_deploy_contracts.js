@@ -10,17 +10,14 @@ var account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
 var account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
 var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
-var acc0 = '0x20bf25e46a40fb64fde7aa8fc3170549a7feab37';
+var acc0 = '0x04b9bf8144bf7c26063645372b2d4f8bf630ad84';
 
-var token0 = '0x8c10b0d326c394820eaee137a4936328d4d5dc0c';
-
-var offset = web3.eth.blockNumber;
-console.log("offset: " + offset);
+var token0 = '0x462d2bf198865371d3043259d175770b3dc4284a';
 
 // crowdsale settings
-var preSale = new Crowdsale(
-	offset, // offset
-	43200, // length
+var pre_sale = new CrowdsaleConfig(
+	1512086400, // 12/01/2017 @ 12:00am (UTC)
+	86400, // 1 day
 	5 * finney, // rate
 	0, // softCap
 	10 * ether, // hardCap
@@ -28,9 +25,9 @@ var preSale = new Crowdsale(
 );
 
 // crowdsale settings
-var crowdsale = new Crowdsale(
-	offset, // offset
-	43200, // length
+var crowdsale = new CrowdsaleConfig(
+	1512432000, // 12/05/2017 @ 12:00am (UTC)
+	1209600, // 14 days
 	10 * finney, // rate
 	10 * ether, // softCap
 	20 * ether, // hardCap
@@ -38,34 +35,20 @@ var crowdsale = new Crowdsale(
 );
 
 // total token supply
-var supply = preSale.amount() + crowdsale.amount();
+var supply = pre_sale.amount() + crowdsale.amount();
 
 module.exports = function(deployer, network) {
 	var Transfers = artifacts.require("./lib/Transfers.sol");
 	var Accumulator = artifacts.require("./SharedAccumulator.sol");
 	var Transfer = artifacts.require("./SharedTransfer.sol");
 	var Token = artifacts.require("./token/ConfigurableERC20.sol");
-	var Crowdsale = artifacts.require("./Crowdsale.sol");
+	var Crowdsale = artifacts.require("./OpenCrowdsale.sol");
 	var Redemption = artifacts.require("./Redemption.sol");
 
 
 	deployer.deploy(Transfers);
-
-/*
-	deployer.link(Transfers, Transfer);
-	deployer.deploy(
-		Transfer,
-		[account1, account2, account3],	// beneficiaries
-		[
-			95, 4, 1,	// shares before 1 ether
-			245, 4, 1,	// shares before 2 ether
-			495, 4, 1	// shares after 2 ether
-		],
-		[ether, 2 * ether, 0]	// thresholds
-	);
-*/
-
 	deployer.link(Transfers, Accumulator);
+
 	deployer.deploy(
 		Accumulator,
 		[account1, account2, account3],	// beneficiaries
@@ -81,16 +64,16 @@ module.exports = function(deployer, network) {
 
 	deployer.deploy(
 		Token,
-		"AGRA",
-		"Agrara Token",
+		"BSL",
+		"Basil Token",
 		0, // tokens are indivisible
 		supply
 	).then(function() {
 		token0 = Token.address;
 	});
 
-	deployCrowdsale(deployer, Crowdsale, Token, preSale);
-	deployCrowdsale(deployer, Crowdsale, Token, crowdsale);
+	deployCrowdsale(deployer, Crowdsale, Token.at(token0), pre_sale);
+	deployCrowdsale(deployer, Crowdsale, Token.at(token0), crowdsale);
 
 	deployer.deploy(
 		Redemption,
@@ -100,30 +83,27 @@ module.exports = function(deployer, network) {
 
 };
 
-function deployCrowdsale(deployer, crowdsaleContract, tokenContract, crowdsale) {
+function deployCrowdsale(deployer, contract, token, config) {
 	deployer.deploy(
-		crowdsaleContract,
-		crowdsale.offset,
-		crowdsale.length,
-		crowdsale.rate,
-		crowdsale.softCap,
-		crowdsale.hardCap,
-		crowdsale.quantum,
+		contract,
+		config.offset,
+		config.length,
+		config.rate,
+		config.softCap,
+		config.hardCap,
+		config.quantum,
 		acc0, // beneficiary
-		token0, // token to sell (used for open crowdsale)
-		"", // token symbol (used for closed crowdsale)
-		"", // token name (used for closed crowdsale)
-		0  // token decimals (used for closed crowdsale)
+		token.address // token to sell
 	).then(function() {
-		var crowdsaleAddress = crowdsaleContract.address;
-		tokenContract.at(token0).transfer(
-			crowdsaleAddress,
-			crowdsale.amount()
+		var addr = contract.address;
+		token.transfer(
+			addr,
+			config.amount()
 		).then(function(result) {
-			console.log(crowdsale.amount() + " tokens (" + token0 + ") successfully allocated for crowdsale " + crowdsaleAddress);
+			console.log(config.amount() + " tokens (" + token.address + ") successfully allocated for crowdsale " + addr);
 			// console.log(result); // too much output
 		}).catch(function(e) {
-			console.error("ERROR! Unable to allocate " + crowdsale.amount() + " tokens (" + token0 + ") for crowdsale " + crowdsaleAddress);
+			console.error("ERROR! Unable to allocate " + config.amount() + " tokens (" + token.address + ") for crowdsale " + addr);
 			console.error(e);
 		});
 	}).catch(function(e) {
@@ -132,7 +112,7 @@ function deployCrowdsale(deployer, crowdsaleContract, tokenContract, crowdsale) 
 	});
 }
 
-function Crowdsale(offset, length, rate, softCap, hardCap, quantum) {
+function CrowdsaleConfig(offset, length, rate, softCap, hardCap, quantum) {
 	this.offset = offset;
 	this.length = length;
 	this.rate = rate;
