@@ -26,7 +26,7 @@ var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
 var acc0 = '0x13e5e5c56424050d30ae42895d744d3e5f0cb131';
 
-var token0 = '0xa6e57c9a29797efdd505dd76916a7b337a2245d8';
+var token0 = '0xbdd47f00864e4cb4628c22835b3c850bf60cab51';
 
 var decimals = 18;
 var pow = Math.pow(10, decimals);
