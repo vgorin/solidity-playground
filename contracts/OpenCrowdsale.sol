@@ -81,7 +81,8 @@ contract OpenCrowdsale {
 	address beneficiary;
 
 	// investor's mapping, required for token redemption in a failed crowdsale
-	mapping(address => uint) balances;
+	// making this field public allows to extend investor-related functionality in the future
+	mapping(address => uint) public balances;
 
 	// events to log
 	event InvestmentAccepted(address indexed holder, uint tokens, uint value);
