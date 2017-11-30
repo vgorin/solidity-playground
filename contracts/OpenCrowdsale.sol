@@ -36,19 +36,19 @@ contract OpenCrowdsale {
 	address creator;
 
 	// crowdsale start (unix timestamp)
-	uint offset;
+	uint public offset;
 
 	// crowdsale length in seconds
-	uint length;
+	uint public length;
 
 	// how many token units a buyer gets per wei
-	uint price;
+	uint public price;
 
-	// crowdsale minimum goal
-	uint softCap;
+	// crowdsale minimum goal in wei
+	uint public softCap;
 
-	// crowdsale maximum goal
-	uint hardCap;
+	// crowdsale maximum goal in wei
+	uint public hardCap;
 
 	// minimum amount of value to transfer to beneficiary in automatic mode
 	uint quantum;
@@ -78,7 +78,7 @@ contract OpenCrowdsale {
 	uint k;
 
 	// address where funds are collected
-	address beneficiary;
+	address public beneficiary;
 
 	// investor's mapping, required for token redemption in a failed crowdsale
 	// making this field public allows to extend investor-related functionality in the future
