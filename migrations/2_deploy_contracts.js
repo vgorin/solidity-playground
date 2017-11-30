@@ -20,22 +20,22 @@ Number.prototype.einstein = function () {
 	return web3.toWei(this, "grand");	// 10^21
 };
 
-var account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
-var account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
-var account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
+const account1 = '0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24';
+const account2 = '0x25fcb8f929BF278669D575ba1A5aD1893e341069';
+const account3 = '0x8f8488f9Ce6F830e750BeF6605137651b84F1835';
 
-var acc0 = account1; //'0x13e5e5c56424050d30ae42895d744d3e5f0cb131';
+const acc0 = account1; //'0x13e5e5c56424050d30ae42895d744d3e5f0cb131';
 
-var token0 = '0xe45a4503c9a3495ad49c2160b780615a1fe47eca';
+let token0 = '0xe45a4503c9a3495ad49c2160b780615a1fe47eca';
 
-var decimals = 18;
-var pow = Math.pow(10, decimals);
+const decimals = 18;
+const pow = Math.pow(10, decimals);
 
 // current unix timestamp as described in www.unixtimestamp.com
-var now = new Date().getTime() / 1000 | 0;
+const now = new Date().getTime() / 1000 | 0;
 
 // crowdsale settings
-var pre_sale = new CrowdsaleConfig(
+const pre_sale = new CrowdsaleConfig(
 	now, // 1512086400, // 12/01/2017 @ 12:00am (UTC)
 	300, // 86400, // 1 day
 	5..finney(), // rate
@@ -45,7 +45,7 @@ var pre_sale = new CrowdsaleConfig(
 );
 
 // crowdsale settings
-var crowdsale = new CrowdsaleConfig(
+const crowdsale = new CrowdsaleConfig(
 	now + 300, // 1512432000, // 12/05/2017 @ 12:00am (UTC)
 	300, // 1209600, // 14 days
 	10..finney(), // rate
@@ -55,7 +55,7 @@ var crowdsale = new CrowdsaleConfig(
 );
 
 // total token supply
-var supply = 2 * (pre_sale.tokens() + crowdsale.tokens());
+const supply = 2 * (pre_sale.tokens() + crowdsale.tokens());
 console.log("total token supply:\t" + supply);
 console.log("token decimals: \t" + decimals);
 console.log("decimal pow: \t" + pow);
@@ -68,12 +68,12 @@ console.log("crowdsale hard cap:\t" + crowdsale.hardCap);
 console.log("crowdsale tokens:\t" + crowdsale.tokens());
 
 module.exports = function(deployer, network) {
-	var Transfers = artifacts.require("./lib/Transfers.sol");
-	var Accumulator = artifacts.require("./SharedAccumulator.sol");
-	var Transfer = artifacts.require("./SharedTransfer.sol");
-	var Token = artifacts.require("./token/ConfigurableERC20.sol");
-	var Crowdsale = artifacts.require("./OpenCrowdsale.sol");
-	var Redemption = artifacts.require("./Redemption.sol");
+	const Transfers = artifacts.require("./lib/Transfers.sol");
+	const Accumulator = artifacts.require("./SharedAccumulator.sol");
+	const Transfer = artifacts.require("./SharedTransfer.sol");
+	const Token = artifacts.require("./token/ConfigurableERC20.sol");
+	const Crowdsale = artifacts.require("./OpenCrowdsale.sol");
+	const Redemption = artifacts.require("./Redemption.sol");
 
 
 /*
@@ -134,7 +134,7 @@ function deployCrowdsale(deployer, contract, token, config) {
 		acc0, // beneficiary
 		token.address // token to sell
 	).then(function() {
-		var addr = contract.address;
+		const addr = contract.address;
 		token.transfer(
 			addr,
 			config.tokens() * pow
