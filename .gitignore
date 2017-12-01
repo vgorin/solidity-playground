@@ -1,5 +1,6 @@
 syntax:glob
 
+node_modules
 build/
 .idea/
 *.iws
@@ -7,6 +8,6 @@ build/
 *.ipr
 
 
-*.sh
+testrpc.sh
 key
 pwd
