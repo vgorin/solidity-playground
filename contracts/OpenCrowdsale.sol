@@ -261,7 +261,7 @@ contract OpenCrowdsale {
 		balances[investor] += tokens;
 
 		// issue tokens, taking into account decimals
-		token.transfer(investor, tokens * k);
+		token.transferFrom(creator, investor, tokens * k);
 	}
 
 	// calculates amount of tokens available to redeem from investor, validations are not required
@@ -282,7 +282,7 @@ contract OpenCrowdsale {
 		balances[investor] -= tokens;
 
 		// redeem tokens, taking into account decimals coefficient
-		token.transferFrom(investor, this, tokens * k);
+		token.transferFrom(investor, creator, tokens * k);
 	}
 
 	// transfers a value to beneficiary, validations are not required
