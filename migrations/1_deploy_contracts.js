@@ -67,8 +67,6 @@ module.exports = async function(deployer, network, accounts) {
 	);
 	const token = Token.address;
 
-	const now = new Date().getTime() / 1000 | 0;
-
 	await deployer.deploy(
 		Crowdsale,
 		1516206900,
