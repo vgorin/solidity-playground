@@ -1,3 +1,10 @@
+const acc = [
+	"0x03cdA1F3DEeaE2de4C73cfC4B93d3A50D0419C24",
+	"0x25fcb8f929bf278669d575ba1a5ad1893e341069",
+	"0x8f8488f9ce6f830e750bef6605137651b84f1835",
+	"0x46c3fbed2c66ba8d7af7e2fc72d535798400d3f5"
+];
+
 module.exports = async function(deployer, network, accounts) {
 	const Transfers = artifacts.require("./lib/Transfers");
 	const Accumulator = artifacts.require("./SharedAccumulator");
@@ -5,6 +12,7 @@ module.exports = async function(deployer, network, accounts) {
 	const Token = artifacts.require("./token/ConfigurableERC20");
 	const Crowdsale = artifacts.require("./token/OpenCrowdsale");
 
+/*
 	await deployer.deploy(Transfers);
 	await deployer.link(Transfers, Accumulator);
 	await deployer.link(Transfers, Transfer);
@@ -12,9 +20,9 @@ module.exports = async function(deployer, network, accounts) {
 	await deployer.deploy(
 		Accumulator,
 		[
-			accounts[1],
-			accounts[2],
-			accounts[3]
+			acc[1],
+			acc[2],
+			acc[3]
 		],
 		[
 			6, 2, 1, // shares under 0.01 ETH
@@ -32,9 +40,9 @@ module.exports = async function(deployer, network, accounts) {
 	await deployer.deploy(
 		Transfer,
 		[
-			accounts[1],
-			accounts[2],
-			accounts[3]
+			acc[1],
+			acc[2],
+			acc[3]
 		],
 		[
 			6, 2, 1,
@@ -48,6 +56,7 @@ module.exports = async function(deployer, network, accounts) {
 		]
 	);
 	const transfer = Accumulator.address;
+*/
 
 	await deployer.deploy(
 		Token,
@@ -62,13 +71,13 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Crowdsale,
-		1516209000,
+		1516206900,
 		600,
 		2000000000000000, // 2 finney (0.002 ether)
 		0,
-		2666666000000000000000, // 2 666.666 ether
+		266666600000000000, // 0.2666666 ether
 		0,
-		accounts[1],
+		accounts[0],
 		token
 	);
 	const presale = Crowdsale.address;
@@ -76,13 +85,13 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Crowdsale,
-		1516209900,
+		1516207500,
 		600,
 		3000000000000000, // 3 finney (0.003 ether)
 		0,
-		20000001000000000000000, // 20 000.001 ether
+		2000000100000000000, // 2.0000001 ether
 		0,
-		accounts[1],
+		accounts[0],
 		token
 	);
 	const crowdsale1 = Crowdsale.address;
@@ -90,21 +99,23 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Crowdsale,
-		1516210800,
+		1516208100,
 		600,
 		4000000000000000, // 3 finney (0.003 ether)
 		0,
-		6666668000000000000000, // 6 666.668 ether
+		666666800000000000, // 0.6666668 ether
 		0,
-		accounts[1],
+		accounts[0],
 		token
 	);
 	const crowdsale2 = Crowdsale.address;
 	await Token.at(token).approve(crowdsale2, 1666667);
 
 
+/*
 	console.log("accumulator: " + accumulator);
 	console.log("transfer: " + transfer);
+*/
 	console.log("token: " + token);
 	console.log("presale: " + presale);
 	console.log("crowdsale1: " + crowdsale1);
