@@ -10,7 +10,7 @@ import './token/ExtendedERC20.sol';
  * A crowdsale is defined by:
  *   offset (required) - crowdsale start, unix timestamp
  *   length (required) - crowdsale length in seconds
- *   rate (required) - token price in wei
+ *   price (required) - token price in wei
  *   soft cap (optional) - minimum amount of funds required for crowdsale success, can be zero (if not used)
  *   hard cap (optional) - maximum amount of funds crowdsale can accept, can be zero (unlimited)
  *   quantum (optional) - enables value accumulation effect to reduce value transfer costs, usually is not used (set to zero)
@@ -93,7 +93,7 @@ contract OpenCrowdsale {
 
 	// a crowdsale is defined by a set of parameters passed here
 	// make sure _end timestamp is in the future in order for crowdsale to be operational
-	// _rate must be positive, this is a price of one token in wei
+	// _price must be positive, this is a price of one token in wei
 	// _hardCap must be greater then _softCap or zero, zero _hardCap means unlimited crowdsale
 	// _quantum may be zero, in this case there will be no value accumulation on the contract
 	function OpenCrowdsale(
