@@ -75,11 +75,6 @@ module.exports = async function(deployer, network, accounts) {
 	const length0 = 600;
 	const length1 = 600;
 	const length2 = 600;
-	const now = new Date().getTime() / 1000 | 0;
-	console.log("current timestamp: " + now);
-	console.log("presale timeframe: " + offset0 + " - " + (offset0 + length0));
-	console.log("crowdsale1 timeframe: " + offset1 + " - " + (offset1 + length1));
-	console.log("crowdsale2 timeframe: " + offset2 + " - " + (offset2 + length2));
 
 	await deployer.deploy(
 		Crowdsale,
@@ -124,6 +119,11 @@ module.exports = async function(deployer, network, accounts) {
 	await Token.at(token).approve(crowdsale2, 1666667);
 
 
+	const now = new Date().getTime() / 1000 | 0;
+	console.log("current timestamp: " + now);
+	console.log("presale timeframe: " + offset0 + " - " + (offset0 + length0));
+	console.log("crowdsale1 timeframe: " + offset1 + " - " + (offset1 + length1));
+	console.log("crowdsale2 timeframe: " + offset2 + " - " + (offset2 + length2));
 /*
 	console.log("accumulator: " + accumulator);
 	console.log("transfer: " + transfer);
