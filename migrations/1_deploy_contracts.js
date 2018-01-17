@@ -5,6 +5,7 @@ module.exports = async function(deployer, network, accounts) {
 	const Token = artifacts.require("./token/ConfigurableERC20");
 	const Crowdsale = artifacts.require("./token/OpenCrowdsale");
 
+/*
 	await deployer.deploy(Transfers);
 	await deployer.link(Transfers, Accumulator);
 	await deployer.link(Transfers, Transfer);
@@ -48,6 +49,7 @@ module.exports = async function(deployer, network, accounts) {
 		]
 	);
 	const transfer = Accumulator.address;
+*/
 
 	await deployer.deploy(
 		Token,
