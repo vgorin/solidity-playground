@@ -44,6 +44,9 @@ contract OpenCrowdsale {
 	// one token price in wei
 	uint public price;
 
+	// inverted token price
+	uint public rate;
+
 	// crowdsale minimum goal in wei
 	uint public softCap;
 
@@ -120,6 +123,7 @@ contract OpenCrowdsale {
 		hardCap = _hardCap;
 		quantum = _quantum;
 		price = _price;
+		rate = 1 ether / price;
 		creator = msg.sender;
 
 		// define beneficiary
@@ -212,7 +216,7 @@ contract OpenCrowdsale {
 	// sends all the value to the beneficiary
 	function withdraw() {
 		// perform validations
-		assert(creator == msg.sender); // only creator can initiate this call
+		// assert(creator == msg.sender); // only creator can initiate this call
 		assert(collected >= softCap); // crowdsale must be successful
 		assert(this.balance > 0); // there should be something to transfer
 
