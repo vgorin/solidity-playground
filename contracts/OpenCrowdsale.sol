@@ -41,7 +41,7 @@ contract OpenCrowdsale {
 	// crowdsale length in seconds
 	uint public length;
 
-	// how many token units a buyer gets per wei
+	// one token price in wei
 	uint public price;
 
 	// crowdsale minimum goal in wei
