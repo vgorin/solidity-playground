@@ -6,9 +6,11 @@ const acc = [
 ];
 
 module.exports = async function(deployer, network, accounts) {
+/*
 	const Transfers = artifacts.require("./lib/Transfers");
 	const Accumulator = artifacts.require("./SharedAccumulator");
 	const Transfer = artifacts.require("./SharedTransfer");
+*/
 	const Token = artifacts.require("./token/ConfigurableERC20");
 	const Crowdsale = artifacts.require("./token/OpenCrowdsale");
 
@@ -67,13 +69,25 @@ module.exports = async function(deployer, network, accounts) {
 	);
 	const token = Token.address;
 
+	const offset0 = 1516216800;
+	const offset1 = 1516217400;
+	const offset2 = 1516218600;
+	const length0 = 600;
+	const length1 = 600;
+	const length2 = 600;
+	const now = new Date().getTime() / 1000 | 0;
+	console.log("current timestamp: " + now);
+	console.log("presale timeframe: " + offset0 + " - " + (offset0 + length0));
+	console.log("crowdsale1 timeframe: " + offset1 + " - " + (offset1 + length1));
+	console.log("crowdsale2 timeframe: " + offset2 + " - " + (offset2 + length2));
+
 	await deployer.deploy(
 		Crowdsale,
-		1516206900,
+		offset0,
 		600,
-		2000000000000000, // 2 finney (0.002 ether)
+		2000000000000000 / 10000, // 2 finney (0.002 ether)
 		0,
-		266666600000000000, // 0.2666666 ether
+		2666666000000000000000 / 10000, // 2 666.666 ether
 		0,
 		accounts[0],
 		token
@@ -83,11 +97,11 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Crowdsale,
-		1516207500,
+		offset1,
 		600,
-		3000000000000000, // 3 finney (0.003 ether)
+		3000000000000000 / 10000, // 3 finney (0.003 ether)
 		0,
-		2000000100000000000, // 2.0000001 ether
+		20000001000000000000000 / 10000, // 20 000.001 ether
 		0,
 		accounts[0],
 		token
@@ -97,11 +111,11 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Crowdsale,
-		1516208100,
+		offset2,
 		600,
-		4000000000000000, // 3 finney (0.003 ether)
+		4000000000000000 / 10000, // 3 finney (0.003 ether)
 		0,
-		666666800000000000, // 0.6666668 ether
+		6666668000000000000000 / 10000, // 6 666.668 ether
 		0,
 		accounts[0],
 		token
