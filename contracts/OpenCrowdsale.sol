@@ -216,7 +216,7 @@ contract OpenCrowdsale {
 	// sends all the value to the beneficiary
 	function withdraw() {
 		// perform validations
-		// assert(creator == msg.sender); // only creator can initiate this call
+		assert(creator == msg.sender || beneficiary == msg.sender); // only creator or beneficiary can initiate this call
 		assert(collected >= softCap); // crowdsale must be successful
 		assert(this.balance > 0); // there should be something to transfer
 
