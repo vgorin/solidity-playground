@@ -68,6 +68,7 @@ module.exports = async function(deployer, network, accounts) {
 	const soft0 = 0;
 	const hard0 = 2666666000000000000000; // 2 666.666 ether
 	const tokens0 = 1333333;
+	const quantum0 = 0;
 
 	const offset1 = new Date('2018-01-18T00:50').getTime() / 1000 | 0;
 	const length1 = 600;
@@ -75,6 +76,7 @@ module.exports = async function(deployer, network, accounts) {
 	const soft1 = 0;
 	const hard1 = 20000001000000000000000; // 20 000.001 ether
 	const tokens1 = 6666667;
+	const quantum1 = 0;
 
 	const offset2 = new Date('2018-01-18T00:50').getTime() / 1000 | 0;
 	const length2 = 600;
@@ -82,7 +84,7 @@ module.exports = async function(deployer, network, accounts) {
 	const soft2 = 0;
 	const hard2 = 6666668000000000000000; // 6 666.668 ether
 	const tokens2 = 1666667;
-
+	const quantum2 = 0;
 
 	const digits = 18;
 	const k = Math.pow(10, digits);
@@ -102,9 +104,9 @@ module.exports = async function(deployer, network, accounts) {
 		offset0,
 		length0,
 		price0 / p,
-		soft0,
+		soft0 / p,
 		hard0 / p,
-		0,
+		quantum0,
 		accounts[0],
 		token
 	);
@@ -116,9 +118,9 @@ module.exports = async function(deployer, network, accounts) {
 		offset1,
 		length1,
 		price1 / p,
-		soft1,
+		soft1 / p,
 		hard1 / p,
-		0,
+		quantum1,
 		accounts[0],
 		token
 	);
@@ -130,9 +132,9 @@ module.exports = async function(deployer, network, accounts) {
 		offset2,
 		length2,
 		price2 / p,
-		soft2,
+		soft2 / p,
 		hard2 / p,
-		0,
+		quantum2,
 		accounts[0],
 		token
 	);
