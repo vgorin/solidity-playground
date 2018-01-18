@@ -105,7 +105,7 @@ contract OpenCrowdsale {
 		uint _quantum,
 		address _beneficiary,
 		address _token
-	) {
+	) public {
 		// validate crowdsale settings (inputs)
 		// require(_offset > 0); // we don't really care
 		require(_length > 0);
@@ -135,7 +135,7 @@ contract OpenCrowdsale {
 
 	// accepts crowdsale investment, requires
 	// crowdsale to be running and not reached its goal
-	function invest() payable {
+	function invest() public payable {
 		// perform validations
 		assert(now >= offset && now < offset + length); // crowdsale is active
 		assert(collected + price <= hardCap || hardCap == 0); // its still possible to buy at least 1 token
@@ -180,7 +180,7 @@ contract OpenCrowdsale {
 
 	// refunds an investor of failed crowdsale,
 	// requires investor to allow token transfer back
-	function refund() payable {
+	function refund() public payable {
 		// perform validations
 		assert(now >= offset + length); // crowdsale ended
 		assert(collected < softCap); // crowdsale failed
@@ -214,7 +214,7 @@ contract OpenCrowdsale {
 	}
 
 	// sends all the value to the beneficiary
-	function withdraw() {
+	function withdraw() public {
 		// perform validations
 		assert(creator == msg.sender || beneficiary == msg.sender); // only creator or beneficiary can initiate this call
 		assert(collected >= softCap); // crowdsale must be successful
@@ -229,7 +229,7 @@ contract OpenCrowdsale {
 
 	// performs an investment, refund or withdrawal,
 	// depending on the crowdsale status
-	function() payable {
+	function() public payable {
 		if(now < offset + length) {
 			// crowdsale is running, invest
 			invest();
@@ -269,7 +269,7 @@ contract OpenCrowdsale {
 	}
 
 	// calculates amount of tokens available to redeem from investor, validations are not required
-	function __redeemAmount(address investor) internal returns (uint amount) {
+	function __redeemAmount(address investor) internal view returns (uint amount) {
 		// round down allowance taking into account token decimals
 		uint allowance = token.allowance(investor, this) / k;
 

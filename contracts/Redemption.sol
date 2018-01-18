@@ -17,7 +17,7 @@ contract Redemption {
 
 	// _rate must be positive, this is a price of one token in wei
 	// _token specifies an address of the ERC20 token to redeem, shouldn't be 0x0
-	function Redemption(uint _rate, address _token) {
+	function Redemption(uint _rate, address _token) public {
 		require(_rate > 0);
 		require(_token != address(0));
 
@@ -29,7 +29,7 @@ contract Redemption {
 
 	// transfers tokens back from investor,
 	// sends value back to him according to rate
-	function redeem() payable {
+	function redeem() public payable {
 		// call 'sender' nicely - investor
 		address investor = msg.sender;
 
@@ -63,7 +63,7 @@ contract Redemption {
 	}
 
 	// allows creator of the redemption to top up the contract
-	function topUp() payable {
+	function topUp() public payable {
 		// shorten msg.* used
 		address sender = msg.sender;
 		uint value = msg.value;
@@ -83,7 +83,7 @@ contract Redemption {
 
 	// either redeems a value to investor
 	// or accepts a top up from creator
-	function() payable {
+	function() public payable {
 		if(creator == msg.sender) {
 			// creator wants to top up the contract
 			topUp();
@@ -103,7 +103,7 @@ contract Redemption {
 	}
 
 	// calculates amount of tokens available to redeem from investor, validations are not required
-	function __redeemAmount(address investor) internal returns (uint amount) {
+	function __redeemAmount(address investor) internal view returns (uint amount) {
 		return token.allowance(investor, this);
 	}
 

@@ -12,7 +12,7 @@ contract ConfigurableERC20 is ExtendedERC20, FixedERC20 {
 		string _name,
 		uint8 _decimals,
 		uint _totalSupply
-	) FixedERC20(_totalSupply) {
+	) public FixedERC20(_totalSupply) {
 		// perform validations
 		require(decimals <= 18);  // wei
 

@@ -16,7 +16,7 @@ library Transfers {
 	}
 
 	// used to validate config parameters used in sharedTransfer
-	function create(address[] beneficiaries, uint[] shares, uint[] thresholds) internal returns (Shared) {
+	function create(address[] beneficiaries, uint[] shares, uint[] thresholds) internal pure returns (Shared) {
 		// total number of beneficiaries, used a lot in the code, shorten it
 		uint n = beneficiaries.length;
 
@@ -133,7 +133,7 @@ library Transfers {
 	// n - number of beneficiaries, values array length
 	// values - array to accumulate each beneficiary value share during current transfer
 	// value - total value during current round of transfer
-	function __split(uint[] memory values, uint[] shares, uint idx, uint value) private {
+	function __split(uint[] memory values, uint[] shares, uint idx, uint value) private pure {
 		// number of beneficiaries
 		uint n = values.length;
 
@@ -159,7 +159,7 @@ library Transfers {
 	}
 
 	// calculates the sum of shares in range [idx * n, (idx + 1) * n)
-	function __totalShare(uint[] shares, uint idx, uint n) private returns(uint share) {
+	function __totalShare(uint[] shares, uint idx, uint n) private pure returns(uint share) {
 		// calculate total share for round 'idx'
 		for(uint i = 0; i < n; i++) {
 			share += shares[idx * n + i];

@@ -8,7 +8,7 @@ contract FixedERC20 is ERC20Token {
 	// fixed token total supply, cannot be changed over time
 	uint __totalSupply;
 
-	function FixedERC20(uint _totalSupply) {
+	function FixedERC20(uint _totalSupply) public {
 		// total supply must not be zero
 		require(_totalSupply > 0);
 
@@ -20,7 +20,7 @@ contract FixedERC20 is ERC20Token {
 	}
 
 	// total supply is constant
-	function totalSupply() constant returns (uint _totalSupply) {
+	function totalSupply() public constant returns (uint _totalSupply) {
 		return __totalSupply;
 	}
 }

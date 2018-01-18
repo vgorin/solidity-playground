@@ -6,10 +6,10 @@ import './SharedAccumulator.sol';
 contract SharedTransfer is SharedAccumulator {
 
 	// inherited constructor
-	function SharedTransfer(address[] beneficiaries, uint[] shares, uint[] thresholds) SharedAccumulator(beneficiaries, shares, thresholds){}
+	function SharedTransfer(address[] beneficiaries, uint[] shares, uint[] thresholds) SharedAccumulator(beneficiaries, shares, thresholds) public {}
 
 	// payable fallback, complex
-	function() payable {
+	function() public payable {
 		t.append(msg.value);
 	}
 
