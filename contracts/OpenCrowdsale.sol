@@ -3,10 +3,11 @@ pragma solidity 0.4.18;
 import './token/ExtendedERC20.sol';
 
 /**
- * Crowdsales have a start and end timestamps, where investors can make
+ * Crowdsale has a life span during which investors can make
  * token purchases and the crowdsale will assign them tokens based
  * on a token per ETH rate. Funds collected are forwarded to beneficiary
  * as they arrive.
+ *
  * A crowdsale is defined by:
  *   offset (required) - crowdsale start, unix timestamp
  *   length (required) - crowdsale length in seconds
@@ -33,7 +34,7 @@ import './token/ExtendedERC20.sol';
 contract OpenCrowdsale {
 	// contract creator, owner of the contract
 	// creator is also supplier of tokens
-	address creator;
+	address private creator;
 
 	// crowdsale start (unix timestamp)
 	uint public offset;
@@ -54,10 +55,13 @@ contract OpenCrowdsale {
 	uint public hardCap;
 
 	// minimum amount of value to transfer to beneficiary in automatic mode
-	uint quantum;
+	uint private quantum;
 
 	// how much value collected (funds raised)
 	uint public collected;
+
+	// how many different addresses made an investment
+	uint public investorsCount;
 
 	// how much value refunded (if crowdsale failed)
 	uint public refunded;
@@ -75,7 +79,7 @@ contract OpenCrowdsale {
 	uint public refunds;
 
 	// The token being sold
-	ExtendedERC20 token;
+	ExtendedERC20 private token;
 
 	// decimal coefficient (k) enables support for tokens with non-zero decimals
 	uint k;
@@ -109,6 +113,7 @@ contract OpenCrowdsale {
 		// validate crowdsale settings (inputs)
 		// require(_offset > 0); // we don't really care
 		require(_length > 0);
+		require(now < _offset + _length); // crowdsale must not be already finished
 		// softCap can be anything, zero means crowdsale doesn't fail
 		require(_hardCap > _softCap || _hardCap == 0); // hardCap must be greater then softCap
 		// quantum can be anything, zero means no accumulation
@@ -261,6 +266,11 @@ contract OpenCrowdsale {
 
 	// transfers tokens to investor, validations are not required
 	function __issueTokens(address investor, uint tokens) internal {
+		// if this is a new investor update investor count
+		if (balances[investor] == 0) {
+			investorsCount++;
+		}
+
 		// for open crowdsales we track investors balances
 		balances[investor] += tokens;
 

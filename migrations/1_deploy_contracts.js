@@ -12,7 +12,7 @@ module.exports = async function(deployer, network, accounts) {
 	const Transfer = artifacts.require("./SharedTransfer");
 */
 	const Token = artifacts.require("./token/ConfigurableERC20");
-	const Crowdsale = artifacts.require("./token/OpenCrowdsale");
+	const Crowdsale = artifacts.require("./OpenCrowdsale");
 
 /*
 	await deployer.deploy(Transfers);
@@ -62,7 +62,7 @@ module.exports = async function(deployer, network, accounts) {
 
 	const totalSupply = 11788618;
 
-	const offset0 = new Date('2018-01-18T19:00').getTime() / 1000 | 0;
+	const offset0 = new Date('2018-01-19T15:00').getTime() / 1000 | 0;
 	const length0 = 300;
 	const price0 = 2000000000000000; // 2 finney (0.002 ether)
 	const soft0 = 0;
@@ -70,7 +70,7 @@ module.exports = async function(deployer, network, accounts) {
 	const tokens0 = 1333333;
 	const quantum0 = 0;
 
-	const offset1 = new Date('2018-01-18T19:10').getTime() / 1000 | 0;
+	const offset1 = new Date('2018-01-19T15:10').getTime() / 1000 | 0;
 	const length1 = 300;
 	const price1 = 3000000000000000; // 3 finney (0.003 ether)
 	const soft1 = 0;
@@ -78,7 +78,7 @@ module.exports = async function(deployer, network, accounts) {
 	const tokens1 = 6666667;
 	const quantum1 = 0;
 
-	const offset2 = new Date('2018-01-18T19:20').getTime() / 1000 | 0;
+	const offset2 = new Date('2018-01-19T15:20').getTime() / 1000 | 0;
 	const length2 = 300;
 	const price2 = 4000000000000000; // 4 finney (0.004 ether)
 	const soft2 = 0;
