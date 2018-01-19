@@ -67,10 +67,10 @@ contract OpenCrowdsale {
 	uint public refunded;
 
 	// how much tokens issued to investors
-	//uint public tokensIssued;
+	uint public tokensIssued;
 
 	// how much tokens redeemed and refunded (if crowdsale failed)
-	//uint public tokensRedeemed;
+	uint public tokensRedeemed;
 
 	// how many successful transactions (with tokens being send back) do we have
 	uint public transactions;
@@ -164,7 +164,7 @@ contract OpenCrowdsale {
 
 		// update crowdsale status
 		collected += value;
-		//tokensIssued += tokens;
+		tokensIssued += tokens;
 		transactions++;
 
 		// transfer tokens to investor
@@ -205,7 +205,7 @@ contract OpenCrowdsale {
 
 		// update crowdsale status
 		refunded += refundValue;
-		//tokensRedeemed += tokens;
+		tokensRedeemed += tokens;
 		refunds++;
 
 		// transfer the tokens back
