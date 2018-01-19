@@ -4,8 +4,8 @@ module.exports = {
 	networks: {
 		development: {
 			provider: new HDWalletProvider(
-				"***",
-				"https://ropsten.infura.io/***"
+				"scan rice rival trend finger trash valve know swear snow dust neutral",
+				"https://ropsten.infura.io/***key***"
 			),
 			network_id: "3", // Match only Ropsten
 			gas: 2000000,
