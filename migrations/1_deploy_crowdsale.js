@@ -1,9 +1,12 @@
 module.exports = async function(deployer, network, accounts) {
 	const Token = artifacts.require("./token/ConfigurableERC20");
-	const Crowdsale = artifacts.require("./OpenCrowdsale");
+	const Crowdsale = artifacts.require("./NamedCrowdsale");
 
+	const tokenName = "Nagri Token (Staging 1)";
+	const symbol = "NGR-1";
 	const totalSupply = 11788618;
 
+	const name0 = "Nagri Presale";
 	const offset0 = new Date('2018-01-27T12:00').getTime() / 1000 | 0;
 	const length0 = 21600;
 	const price0 = 2000000000000000; // 2 finney (0.002 ether)
@@ -12,6 +15,7 @@ module.exports = async function(deployer, network, accounts) {
 	const tokens0 = 1333333;
 	const quantum0 = 0;
 
+	const name1 = "Nagri Crowdsale, Phase 1";
 	const offset1 = new Date('2018-01-28T12:00').getTime() / 1000 | 0;
 	const length1 = 21600;
 	const price1 = 3000000000000000; // 3 finney (0.003 ether)
@@ -20,6 +24,7 @@ module.exports = async function(deployer, network, accounts) {
 	const tokens1 = 6666667;
 	const quantum1 = 0;
 
+	const name2 = "Nagri Crowdsale, Phase 2";
 	const offset2 = new Date('2018-01-29T12:00').getTime() / 1000 | 0;
 	const length2 = 21600;
 	const price2 = 4000000000000000; // 4 finney (0.004 ether)
@@ -34,8 +39,8 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Token,
-		"NGR-1",
-		"Nagri Token (Staging 1)",
+		symbol,
+		tokenName,
 		digits,
 		totalSupply * k
 	);
@@ -43,6 +48,7 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Crowdsale,
+		name0,
 		offset0,
 		length0,
 		price0 / p,
@@ -57,6 +63,7 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Crowdsale,
+		name1,
 		offset1,
 		length1,
 		price1 / p,
@@ -71,6 +78,7 @@ module.exports = async function(deployer, network, accounts) {
 
 	await deployer.deploy(
 		Crowdsale,
+		name2,
 		offset2,
 		length2,
 		price2 / p,
