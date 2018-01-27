@@ -17,7 +17,7 @@ contract NamedCrowdsale is OpenCrowdsale {
 		uint _quantum,
 		address _beneficiary,
 		address _token
-	) OpenCrowdsale(_offset, _length, _price, _softCap, _hardCap, _quantum, _beneficiary, _token) {
+	) public OpenCrowdsale(_offset, _length, _price, _softCap, _hardCap, _quantum, _beneficiary, _token) {
 		name = _name;
 	}
 }

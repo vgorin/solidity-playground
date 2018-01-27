@@ -1,4 +1,9 @@
 module.exports = async function(deployer, network, accounts) {
+	if (network !== 'development') {
+		return;
+	}
+
+
 	const Token = artifacts.require("./token/ConfigurableERC20");
 	const Crowdsale = artifacts.require("./NamedCrowdsale");
 
