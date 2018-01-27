@@ -23,14 +23,11 @@ contract('OpenCrowdsale', function(accounts) {
 		await crowdsale.refund.sendTransaction({from: accounts[1]});
 		assert.equal((await token.balanceOf(accounts[0])).toNumber(), 11788618, "incorrect refund");
 	});
-
-	
-/*
 	it("invest, withdraw", async function() {
 		const token = await Token.new("BSL", "Basil Token", 0, 11788618);
 		const crowdsale = await Crowdsale.new(
 			"Basil Token Withdraw",
-			new Date().getTime() / 1000 | 0,
+			300 + new Date().getTime() / 1000 | 0,
 			300,
 			200000000000,
 			66666600000000000,
@@ -46,5 +43,4 @@ contract('OpenCrowdsale', function(accounts) {
 		await crowdsale.withdraw();
 		assert.equal((await web3.eth.getBalance(accounts[7])).toNumber(), 100066666600000000000, "incorrect withdraw");
 	});
-*/
 });

@@ -1,7 +1,10 @@
 syntax:glob
 
-node_modules
+node_modules/
 build/
+coverage/
+coverageEnv/
+*.json
 .idea/
 *.iws
 *.iml
