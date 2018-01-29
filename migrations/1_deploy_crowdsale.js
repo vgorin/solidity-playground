@@ -12,8 +12,8 @@ module.exports = async function(deployer, network, accounts) {
 	const totalSupply = 11788618;
 
 	const name0 = "Nagri Presale";
-	const offset0 = new Date('2018-01-27T12:00').getTime() / 1000 | 0;
-	const length0 = 21600;
+	const offset0 = new Date('2018-01-29T19:00').getTime() / 1000 | 0;
+	const length0 = 1800;
 	const price0 = 2000000000000000; // 2 finney (0.002 ether)
 	const soft0 = 0;
 	const hard0 = 2666666000000000000000; // 2 666.666 ether
@@ -21,8 +21,8 @@ module.exports = async function(deployer, network, accounts) {
 	const quantum0 = 0;
 
 	const name1 = "Nagri Crowdsale, Phase 1";
-	const offset1 = new Date('2018-01-28T12:00').getTime() / 1000 | 0;
-	const length1 = 21600;
+	const offset1 = new Date('2018-01-29T20:00').getTime() / 1000 | 0;
+	const length1 = 1800;
 	const price1 = 3000000000000000; // 3 finney (0.003 ether)
 	const soft1 = 0;
 	const hard1 = 20000001000000000000000; // 20 000.001 ether
@@ -30,8 +30,8 @@ module.exports = async function(deployer, network, accounts) {
 	const quantum1 = 0;
 
 	const name2 = "Nagri Crowdsale, Phase 2";
-	const offset2 = new Date('2018-01-29T12:00').getTime() / 1000 | 0;
-	const length2 = 21600;
+	const offset2 = new Date('2018-01-29T21:00').getTime() / 1000 | 0;
+	const length2 = 1800;
 	const price2 = 4000000000000000; // 4 finney (0.004 ether)
 	const soft2 = 0;
 	const hard2 = 6666668000000000000000; // 6 666.668 ether
