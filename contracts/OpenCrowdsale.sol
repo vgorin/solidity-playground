@@ -174,7 +174,7 @@ contract OpenCrowdsale {
 		investor.transfer(msg.value - value);
 
 		// accumulate the value or transfer it to beneficiary
-		if(value + collected >= softCap && this.balance >= quantum) {
+		if(collected >= softCap && this.balance >= quantum) {
 			// transfer all the value to beneficiary
 			__beneficiaryTransfer(this.balance);
 		}
