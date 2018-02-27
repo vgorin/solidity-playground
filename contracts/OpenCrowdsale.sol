@@ -201,7 +201,6 @@ contract OpenCrowdsale {
 
 		// additional validations
 		require(tokens > 0);
-		assert(refundValue <= this.balance);
 
 		// update crowdsale status
 		refunded += refundValue;
