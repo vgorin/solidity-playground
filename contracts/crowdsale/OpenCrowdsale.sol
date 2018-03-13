@@ -1,6 +1,6 @@
 pragma solidity 0.4.18;
 
-import './token/ExtendedERC20.sol';
+import '../token/ExtendedERC20.sol';
 
 /**
  * Crowdsale has a life span during which investors can make
@@ -20,13 +20,13 @@ import './token/ExtendedERC20.sol';
  * Open crowdsale (aka attached crowdsale) doesn't own tokens and doesn't perform any token emission.
  * It expects enough tokens to be available on its address:
  * these tokens are used for issuing them to investors.
- * Token redemption is done in opposite way: tokens accumulate back on contract's address
+ * Token redemption is done in opposite way: tokens accumulate back on contract's address.
  * Beneficiary is specified by its address.
  * Use this implementation if you need to make several crowdsales with the same token being sold.
  *
  * Closed crowdsale owns all the tokens, it guarantees no token emission will occur outside the crowdsale.
  * The tokens created by a crowdsale are used for issuing them to investors.
- * Token redemption is done in opposite way: tokens accumulate back on crowdsale's address
+ * Token redemption is done in opposite way: tokens accumulate back on crowdsale's address.
  * Beneficiary is specified by its address.
  * Use this implementation if you won't have several crowdsales with the same token being sold.
  *

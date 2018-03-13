@@ -1,7 +1,5 @@
 pragma solidity 0.4.18;
 
-import '../token/ERC20.sol';
-
 // Contains value transfer related utility functions
 library Transfers {
 	// base structure for storing config and current state

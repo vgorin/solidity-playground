@@ -1,6 +1,6 @@
 pragma solidity 0.4.18;
 
-import './token/ERC20.sol';
+import '../token/ERC20.sol';
 
 // Token redemption is opposite to crowdsale.
 // It allows redeeming tokens back from investors

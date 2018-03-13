@@ -1,6 +1,6 @@
 pragma solidity 0.4.18;
 
-import './lib/Transfers.sol';
+import '../lib/Transfers.sol';
 
 // shares incoming value between the beneficiaries according to their shares
 // on-demand edition of SharedTransfer
