@@ -4,7 +4,7 @@ module.exports = {
 	networks: {
 		development: {
 			provider: new HDWalletProvider(
-				"scan rice rival trend finger trash valve know swear snow dust neutral",
+				"12 seed words, see https://freewallet.org/bip39-recovery-from-mnemonic-bitcoin-and-other-cryptocurrencies#english",
 				"https://ropsten.infura.io/***key***"
 			),
 			network_id: "3", // Match only Ropsten
