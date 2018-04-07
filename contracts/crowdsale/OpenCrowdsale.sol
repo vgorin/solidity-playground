@@ -34,7 +34,7 @@ import '../token/ExtendedERC20.sol';
 contract OpenCrowdsale {
 	// contract creator, owner of the contract
 	// creator is also supplier of tokens
-	address private creator;
+	address public creator;
 
 	// crowdsale start (unix timestamp)
 	uint public offset;
@@ -55,7 +55,7 @@ contract OpenCrowdsale {
 	uint public hardCap;
 
 	// minimum amount of value to transfer to beneficiary in automatic mode
-	uint private quantum;
+	uint public quantum;
 
 	// how much value collected (funds raised)
 	uint public collected;
@@ -79,10 +79,10 @@ contract OpenCrowdsale {
 	uint public refunds;
 
 	// The token being sold
-	ExtendedERC20 private token;
+	ExtendedERC20 public token;
 
 	// decimal coefficient (k) enables support for tokens with non-zero decimals
-	uint k;
+	uint public k;
 
 	// address where funds are collected
 	address public beneficiary;
@@ -142,8 +142,8 @@ contract OpenCrowdsale {
 	// crowdsale to be running and not reached its goal
 	function invest() public payable {
 		// perform validations
-		assert(now >= offset && now < offset + length); // crowdsale is active
-		assert(collected + price <= hardCap || hardCap == 0); // its still possible to buy at least 1 token
+		require(now >= offset && now < offset + length); // crowdsale is active
+		require(collected + price <= hardCap || hardCap == 0); // its still possible to buy at least 1 token
 		require(msg.value >= price); // value sent is enough to buy at least one token
 
 		// call 'sender' nicely - investor
@@ -187,8 +187,8 @@ contract OpenCrowdsale {
 	// requires investor to allow token transfer back
 	function refund() public payable {
 		// perform validations
-		assert(now >= offset + length); // crowdsale ended
-		assert(collected < softCap); // crowdsale failed
+		require(now >= offset + length); // crowdsale ended
+		require(collected < softCap); // crowdsale failed
 
 		// call 'sender' nicely - investor
 		address investor = msg.sender;
@@ -220,9 +220,9 @@ contract OpenCrowdsale {
 	// sends all the value to the beneficiary
 	function withdraw() public {
 		// perform validations
-		assert(creator == msg.sender || beneficiary == msg.sender); // only creator or beneficiary can initiate this call
-		assert(collected >= softCap); // crowdsale must be successful
-		assert(this.balance > 0); // there should be something to transfer
+		require(creator == msg.sender || beneficiary == msg.sender); // only creator or beneficiary can initiate this call
+		require(collected >= softCap); // crowdsale must be successful
+		require(this.balance > 0); // there should be something to transfer
 
 		// how much to withdraw (entire balance obviously)
 		uint value = this.balance;
